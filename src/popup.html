@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body {
+      width: 450px;
+      min-height: 350px;
+      margin: 0;
+      padding: 16px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #fafafa;
+      color: #333;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+    
+    /* 暗黑主题 */
+    @media (prefers-color-scheme: dark) {
+      body {
+        background: #1a1a1a;
+        color: #e5e5e5;
+      }
+    }
+    
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #e0e0e0;
+    }
+    
+    .title {
+      font-size: 20px;
+      font-weight: 600;
+      color: #333;
+    }
+    
+    /* 暗黑主题 - 标题 */
+    @media (prefers-color-scheme: dark) {
+      .title {
+        color: #e5e5e5;
+      }
+    }
+    
+    .btn {
+      background: #4285f4;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 500;
+      transition: background-color 0.2s ease;
+    }
+    
+    .btn:hover {
+      background: #3367d6;
+    }
+    
+    .apply-settings-btn {
+      margin-top: 24px;
+      width: 100%;
+      padding: 10px;
+      font-size: 14px;
+      font-weight: 500;
+      border-radius: 6px;
+      transition: background-color 0.2s ease;
+      background: #4285f4;
+      color: white;
+    }
+    
+    .apply-settings-btn:hover {
+      background: #3367d6;
+    }
+    
+    .platform-section {
+      margin-bottom: 24px;
+    }
+    
+    .platform-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid #f3f4f6;
+    }
+    
+    /* 暗黑主题 - 平台标题 */
+    @media (prefers-color-scheme: dark) {
+      .platform-title {
+        color: #d1d5db;
+        border-bottom-color: #404040;
+      }
+    }
+    
+    .platform-name {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: 1;
+      font-size: 20px;
+    }
+    
+    .live-count {
+      font-size: 14px;
+      font-weight: 500;
+      color: #10b981;
+      padding: 4px 10px;
+      border-radius: 12px;
+      border: 1px solid #bbf7d0;
+    }
+
+    .platform-icon {
+      width: 20px;
+      height: 20px;
+      margin-right: 6px;
+      border-radius: 2px;
+      object-fit: contain;
+    }
+    
+    .streamer-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    
+    .streamer-item {
+      display: flex;
+      align-items: center;
+      padding: 6px 12px;
+      margin-bottom: 6px;
+      background: #ffffff;
+      border: 1px solid #e1e5e9;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    
+    .streamer-item:hover {
+      background: #f8f9fa;
+      border-color: #d1d5db;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      transform: translateY(-1px);
+    }
+    
+    .streamer-item.live {
+      background: #ffffff;
+    }
+    
+    .streamer-item.live:hover {
+      background: #f8f9fa;
+    }
+    
+    /* 暗黑主题 - 主播卡片 */
+    @media (prefers-color-scheme: dark) {
+      .streamer-item {
+        background: #2d2d2d;
+        border-color: #404040;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+      }
+      
+      .streamer-item:hover {
+        background: #3a3a3a;
+        border-color: #555555;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+      }
+      
+      .streamer-item.live {
+        background: #2d2d2d;
+      }
+      
+      .streamer-item.live:hover {
+        background: #3a3a3a;
+      }
+    }
+    
+    .streamer-avatar {
+      border: 2px solid #f3f4f6;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      background: #f9fafb;
+      transition: all 0.2s ease;
+    }
+    
+    .streamer-item:hover .streamer-avatar {
+      border-color: #e5e7eb;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+    
+    .login-prompt {
+      padding: 12px;
+      background: #fff3cd;
+      border: 1px solid #ffeaa7;
+      border-radius: 6px;
+      margin-bottom: 8px;
+    }
+    
+    .login-message {
+      font-size: 14px;
+      color: #856404;
+      margin-bottom: 8px;
+    }
+    
+    .login-btn {
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+      width: 100%;
+    }
+    
+    .login-btn:hover {
+      background: #0056b3;
+    }
+    
+    /* 暗黑主题 - 登录提示 */
+    @media (prefers-color-scheme: dark) {
+      .login-prompt {
+        background: #3a2f1a;
+        border-color: #5a4a2a;
+      }
+      
+      .login-message {
+        color: #d4b106;
+      }
+      
+      .login-btn {
+        background: #0d6efd;
+      }
+      
+      .login-btn:hover {
+        background: #0b5ed7;
+      }
+    }
+    
+
+    
+    .no-live, .no-follow {
+      padding: 12px;
+      text-align: center;
+      color: #999;
+      font-size: 14px;
+      background: #f8f9fa;
+      border-radius: 6px;
+      margin-bottom: 8px;
+    }
+    
+    /* 暗黑主题 - 空状态 */
+    @media (prefers-color-scheme: dark) {
+      .no-live, .no-follow {
+        background: #2d2d2d;
+        color: #888;
+      }
+    }
+    
+    .streamer-avatar {
+      width: 64px;
+      height: 64px;
+      border-radius: 6px;
+      margin-right: 12px;
+      object-fit: cover;
+    }
+    
+    .streamer-info {
+      flex: 1;
+    }
+    
+    .streamer-name {
+      font-size: 16px;
+      font-weight: 500;
+      color: #333;
+      margin-bottom: 3px;
+    }
+    
+    .streamer-title {
+      font-size: 14px;
+      color: #6b7280;
+      font-weight: 400;
+      margin-bottom: 4px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    
+    /* 暗黑主题 - 主播信息 */
+    @media (prefers-color-scheme: dark) {
+      .streamer-name {
+        color: #e5e5e5;
+      }
+      
+      .streamer-title {
+        color: #9ca3af;
+      }
+    }
+    
+    .streamer-stats {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    
+    .stat-item {
+      font-size: 12px;
+      color: #9ca3af;
+      display: flex;
+      align-items: center;
+      gap: 2px;
+    }
+    
+    .stat-item .icon {
+      font-size: 10px;
+      margin-right: 1px;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #666;
+      font-size: 16px;
+    }
+    
+    .empty {
+      text-align: center;
+      padding: 40px;
+      color: #999;
+      font-size: 16px;
+    }
+    
+    /* 设置区域样式 */
+    .settings-panel {
+      display: none;
+      margin-top: 20px;
+      padding: 20px;
+      border-radius: 12px;
+      position: relative;
+      z-index: 100;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+    
+    .settings-heading {
+      margin-top: 0;
+      margin-bottom: 16px;
+      font-size: 18px;
+      font-weight: 600;
+    }
+    
+    .settings-description {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+    
+    .platform-sortable-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      max-height: 300px;
+      overflow-y: auto;
+      border-radius: 8px;
+    }
+    
+    .platform-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      background: #ffffff;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      cursor: move;
+      transition: all 0.2s ease;
+    }
+    
+    .platform-item:hover {
+      background: #f8f9fa;
+      border-color: #d1d5db;
+    }
+    
+    .platform-item.disabled {
+      opacity: 0.6;
+      background: #f5f5f5;
+    }
+    
+    .platform-item.disabled .platform-name {
+      color: #999;
+    }
+    
+    .platform-switch {
+      margin-left: auto;
+      position: relative;
+      display: inline-block;
+      width: 40px;
+      height: 20px;
+    }
+    
+    .platform-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    
+    .switch-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 24px;
+    }
+    
+    .switch-slider:before {
+      position: absolute;
+      content: "";
+      height: 12px;
+      width: 12px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+    
+    input:checked + .switch-slider {
+      background-color: #4285f4;
+    }
+    
+    input:checked + .switch-slider:before {
+      transform: translateX(20px);
+    }
+    
+    .drag-handle {
+      color: #999;
+      cursor: move;
+      font-size: 18px;
+      font-weight: bold;
+    }
+    
+    .apply-settings-btn {
+      margin-top: 24px;
+      width: 100%;
+      padding: 10px;
+      font-size: 14px;
+      cursor: pointer;
+      font-weight: 500;
+    }
+    
+    /* 暗黑主题 - 设置区域 */
+    @media (prefers-color-scheme: dark) {
+      .settings-panel {
+        background: #2d2d2d;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      }
+      
+      .settings-heading {
+        color: #e5e5e5;
+      }
+      
+      .settings-description {
+        color: #b0b0b0;
+      }
+      
+      .platform-item {
+        background: #3a3a3a;
+        border: 1px solid #404040;
+      }
+      
+      .platform-item:hover {
+        background: #444444;
+      }
+      
+      .platform-name {
+        color: #e5e5e5;
+      }
+      
+      .drag-handle {
+        color: #999;
+      }
+      
+      .apply-settings-btn {
+        background: #4285f4;
+        color: white;
+      }
+      
+      .apply-settings-btn:hover {
+        background: #3367d6;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="title">直播小助手</div>
+    <div class="btn-group">
+      <button class="btn" id="refreshBtn">刷新</button>
+      <button class="btn" id="settingsBtn">设置</button>
+    </div>
+  </div>
+  
+  <div id="content">
+    <div class="loading">正在加载关注列表...</div>
+  </div>
+  
+  <!-- 提示信息容器 -->
+  <div id="messageContainer" class="message-container" style="display: none; position: fixed; top: 16px; left: 50%; transform: translateX(-50%); padding: 12px 24px; background: #4285f4; color: white; border-radius: 6px; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.15);"></div>
+  
+  <!-- 设置区域 -->
+  <div id="settingsPanel" class="settings-panel">
+    <h3 class="settings-heading">平台显示顺序设置</h3>
+    <p class="settings-description">拖拽平台项来调整显示顺序：</p>
+    <ul class="platform-sortable-list" id="platformSortable">
+      <!-- 平台项将通过JavaScript动态生成 -->
+    </ul>
+    <button class="apply-settings-btn" id="applySettingsBtn">应用设置</button>
+  </div>
+  
+  
+  <script src="/src/popup.js"></script>
+</body>
+</html>

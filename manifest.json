@@ -1,0 +1,47 @@
+{
+  "manifest_version": 3,
+  "name": "直播小助手",
+  "version": "1.0.0",
+  "description": "整合多个直播平台的关注列表",
+  "homepage_url": "https://github.com/L1cardo/Live-Assistant",
+  "author": "Licardo",
+  "icons": {
+    "128": "icon.png"
+  },
+  "permissions": [
+    "cookies",
+    "storage"
+  ],
+  "host_permissions": [
+    "*://*.douyu.com/*",
+    "*://*.douyucdn.cn/*",
+    "*://*.huya.com/*",
+    "*://*.huyaimg.msstatic.com/*",
+    "*://*.bilibili.com/*",
+    "*://*.hdslb.com/*",
+    "*://*.douyin.com/*",
+    "*://*.twitch.tv/*",
+    "*://gql.twitch.tv/*"
+  ],
+  "action": {
+    "default_popup": "/src/popup.html",
+    "default_title": "直播小助手"
+  },
+  "background": {
+    "service_worker": "/src/background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.douyu.com/*",
+        "*://*.huya.com/*",
+        "*://*.bilibili.com/*",
+        "*://*.douyin.com/*",
+        "*://*.twitch.tv/*"
+      ],
+      "js": [
+        "/src/content.js"
+      ]
+    }
+  ]
+}
