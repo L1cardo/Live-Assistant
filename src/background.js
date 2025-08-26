@@ -49,10 +49,6 @@ class DouyuAPI {
   async getFollowedStreamers() {
     try {
       const cookies = await this.getCookies("https://www.douyu.com");
-      console.log(
-        "斗鱼cookies:",
-        cookies.map((c) => c.name)
-      );
 
       const acfUid = cookies.find((c) => c.name === "acf_uid");
       const dyDid = cookies.find((c) => c.name === "dy_did");
@@ -112,8 +108,6 @@ class DouyuAPI {
     }
 
     return data.data.list.map((item) => {
-      console.log("斗鱼单个主播数据:", item);
-
       // 使用avatar_small字段作为头像
       const avatar = item.avatar_small || item.avatar || item.owner_avatar;
       let avatarUrl = avatar;
@@ -133,9 +127,6 @@ class DouyuAPI {
         startTime: item.show_time ? new Date(item.show_time * 1000) : null, // 时间戳转换
         thumbnail: item.room_src, // 添加缩略图URL
       };
-
-      console.log("解析的热度:", streamer.viewers, "原始数据:", item.online);
-      console.log("解析后的斗鱼主播:", streamer);
       return streamer;
     });
   }
@@ -146,10 +137,6 @@ class HuyaAPI {
   async getFollowedStreamers() {
     try {
       const cookies = await this.getCookies("https://www.huya.com");
-      console.log(
-        "虎牙cookies:",
-        cookies.map((c) => c.name)
-      );
 
       const udbUid = cookies.find((c) => c.name === "udb_uid");
 
@@ -246,10 +233,6 @@ class BilibiliAPI {
   async getFollowedStreamers() {
     try {
       const cookies = await this.getCookies("https://www.bilibili.com");
-      console.log(
-        "B站cookies:",
-        cookies.map((c) => c.name)
-      );
 
       const sessdata = cookies.find((c) => c.name === "SESSDATA");
       const uid = cookies.find((c) => c.name === "DedeUserID");
@@ -309,7 +292,6 @@ class BilibiliAPI {
     }
 
     return data.data.list.map((item) => {
-      // 修正B站API数据结构的处理
       const streamer = {
         name: item.uname || "未知主播",
         avatar: item.face,
@@ -323,7 +305,6 @@ class BilibiliAPI {
         thumbnail: item.keyframe || item.cover_from_user,
       };
 
-      console.log("解析后的B站主播:", streamer);
       return streamer;
     });
   }
@@ -334,11 +315,6 @@ class DouyinAPI {
   async getFollowedStreamers() {
     try {
       const cookies = await this.getCookies("https://www.douyin.com");
-      console.log(
-        "抖音cookies:",
-        cookies.map((c) => c.name)
-      );
-
       const cookieStr = cookies.map((c) => `${c.name}=${c.value}`).join("; ");
       console.log("抖音请求cookie:", cookieStr);
 
@@ -433,7 +409,6 @@ class DouyinAPI {
         thumbnail: coverUrl,
       };
 
-      console.log("解析后的抖音主播:", streamer);
       return streamer;
     });
   }
@@ -445,10 +420,6 @@ class TwitchAPI {
   async getFollowedStreamers() {
     try {
       const cookies = await this.getCookies("https://www.twitch.tv");
-      console.log(
-        "Twitch cookies:",
-        cookies.map((c) => c.name)
-      );
 
       const authTokenCookie = cookies.find((c) => c.name === "auth-token");
       const xDeviceIDCookie = cookies.find((c) => c.name === "unique_id");
@@ -574,7 +545,6 @@ class TwitchAPI {
         thumbnail: `https://static-cdn.jtvnw.net/previews-ttv/live_user_${node.broadcaster.login}-320x180.jpg`, // 添加缩略图字段保持一致性
       }
       
-      console.log("解析后的Twitch主播:", streamer);
       return streamer;
     });
   }

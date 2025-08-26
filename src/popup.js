@@ -208,8 +208,6 @@ class LiveAssistant {
           const defaultAvatar = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMTYiIGN5PSIxNiIgcj0iMTYiIGZpbGw9IiNlMGUwZTAiLz4KPGNpcmNsZSBjeD0iMTYiIGN5PSIxMiIgcj0iNSIgZmlsbD0iIzk5OTk5OSIvPgo8cGF0aCBkPSJNNiAyNmMwLTUuNSA0LjUtMTAgMTAtMTBzMTAgNC41IDEwIDEwIiBmaWxsPSIjOTk5OTk5Ii8+Cjwvc3ZnPg==';
 
           liveStreamers.forEach(streamer => {
-            console.log('渲染主播:', streamer.name, '头像URL:', streamer.avatar);
-
             // 对于斗鱼和虎牙平台，添加缩略图显示
             let thumbnailHtml = '';
             if (streamer.thumbnail) {
@@ -290,10 +288,6 @@ class LiveAssistant {
         if (defaultAvatar && img.src !== defaultAvatar) {
           img.src = defaultAvatar;
         }
-      });
-
-      img.addEventListener('load', () => {
-        console.log('头像加载成功:', img.src);
       });
     });
 
@@ -411,9 +405,7 @@ class LiveAssistant {
   }
   
   // 获取观看数据统计
-  getViewerStats(streamer) {
-    console.log('获取观看统计:', streamer.platform, '观看人数/热度:', streamer.viewers, '类型:', typeof streamer.viewers);
-    
+  getViewerStats(streamer) {    
     if (streamer.platform === 'douyu' || streamer.platform === 'huya') {
       // 斗鱼和虎牙的viewers字段实际是热度，强制显示
       const heat = streamer.viewers;

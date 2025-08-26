@@ -20,20 +20,20 @@ A Chrome extension that integrates follow lists from multiple live streaming pla
 
 ## 📦 Supported Platforms
 
-| Platform | Status | Notes |
-|----------|--------|-------|
-| Douyu | ✅ Full Support | Includes streamer info and heat |
-| Huya | ✅ Full Support | Includes streamer info and heat |
-| Bilibili | ✅ Full Support | Includes streamer info and viewer count |
-| Douyin | ❌ Not yet | - |
-| Twitch | ❌ Not yet | - |
+| Platform | Status |
+|----------|--------|
+| Douyu | ✅ Full Support |
+| Huya | ✅ Full Support |
+| Bilibili | ✅ Full Support |
+| Douyin | ✅ Full Support |
+| Twitch | ✅ Full Support |
 
 ## 🚀 Installation
 
 ### Method 1: Install from Chrome Web Store (Recommended)
 
-1. Visit [Chrome Web Store](https://chrome.google.com/webstore/detail/live-assistant/your-extension-id)
-2. Click "Add to Chrome"
+1. Visit [Chrome Web Store](https://chromewebstore.google.com/detail/gapakkgfjmmbdgaabgedecdhnpheboln) or [Edge Addons Store](https://microsoftedge.microsoft.com/addons/detail/iccpkamhcodiboccdihoimjaeoooflhk)
+2. Click "Add to Browser"
 3. After installation, find the extension icon in your browser toolbar
 
 ### Method 2: Manual Installation

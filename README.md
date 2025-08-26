@@ -19,20 +19,20 @@
 
 ## 📦 支持的平台
 
-| 平台 | 状态 | 说明 |
-|------|------|------|
-| 斗鱼 | ✅ 完全支持 | 包含主播信息和热度 |
-| 虎牙 | ✅ 完全支持 | 包含主播信息和热度 |
-| B站 | ✅ 完全支持 | 包含主播信息和观看人数 |
-| 抖音 | ❌ 尚不支持 | - |
-| Twitch | ❌ 尚不支持 | - |
+| 平台 | 状态 |
+|------|------|
+| 斗鱼 | ✅ 完全支持 |
+| 虎牙 | ✅ 完全支持 |
+| B站 | ✅ 完全支持 |
+| 抖音 | ✅ 完全支持 |
+| Twitch | ✅ 完全支持 |
 
 ## 🚀 安装说明
 
 ### 方法一：从Chrome Web Store安装（推荐）
 
-1. 访问 [Chrome Web Store](https://chrome.google.com/webstore/detail/live-assistant/your-extension-id)
-2. 点击"添加至Chrome"
+1. 访问 [Chrome Web Store](https://chromewebstore.google.com/detail/gapakkgfjmmbdgaabgedecdhnpheboln) 或者 [Edge Addons Store](https://microsoftedge.microsoft.com/addons/detail/iccpkamhcodiboccdihoimjaeoooflhk)
+2. 点击"添加至浏览器"
 3. 安装完成后，在浏览器工具栏找到扩展图标
 
 ### 方法二：手动安装
