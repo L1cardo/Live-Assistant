@@ -168,6 +168,12 @@ class LiveAssistant {
       }
       
       const platformInfo = this.platforms[platformKey];
+      // 安全检查：确保 platformInfo 存在
+      if (!platformInfo) {
+        console.warn(`跳过无效的平台配置: ${platformKey}`, platformInfo);
+        return;
+      }
+      
       const platformData = followedData[platformKey];
       
       // 计算正在直播的主播数量
@@ -319,6 +325,12 @@ class LiveAssistant {
     // 为每个启用的平台创建按钮
     this.enabledPlatforms.forEach(platformKey => {
       const platformInfo = this.platforms[platformKey];
+      // 安全检查：确保 platformInfo 存在且包含 icon 属性
+      if (!platformInfo || !platformInfo.icon) {
+        console.warn(`跳过无效的平台配置: ${platformKey}`, platformInfo);
+        return;
+      }
+      
       const button = document.createElement('button');
       button.className = 'floating-button';
       button.title = platformInfo.name;
@@ -493,7 +505,7 @@ class LiveAssistant {
       refreshBtn.style.display = 'inline-block'; // 显示刷新按钮
       // 显示悬浮按钮
       if (floatingButtonsContainer) {
-        floatingButtonsContainer.style.display = 'block';
+        floatingButtonsContainer.style.display = this.floatingButtonsVisible ? 'block' : 'none';
       }
     }
   }
@@ -505,23 +517,27 @@ class LiveAssistant {
     
     // 按当前顺序渲染平台项
     this.platformOrder.forEach(platformKey => {
-      if (this.platforms[platformKey]) {
-        const platform = this.platforms[platformKey];
-        const item = document.createElement('li');
-        item.className = 'platform-item';
-        item.setAttribute('data-platform', platformKey);
-        item.draggable = true;
-        item.innerHTML = `
-          <div class="drag-handle">≡</div>
-          <img class="platform-icon" src="${platform.icon}" alt="${platform.name}">
-          <span class="platform-name">${platform.name}</span>
-          <label class="platform-switch">
-            <input type="checkbox" ${this.enabledPlatforms.includes(platformKey) ? 'checked' : ''}>
-            <span class="switch-slider"></span>
-          </label>
-        `;
-        sortable.appendChild(item);
+      // 安全检查：确保平台配置存在且不为null
+      if (!this.platforms[platformKey] || typeof this.platforms[platformKey] !== 'object') {
+        console.warn(`跳过无效的平台配置: ${platformKey}`, this.platforms[platformKey]);
+        return;
       }
+      
+      const platform = this.platforms[platformKey];
+      const item = document.createElement('li');
+      item.className = 'platform-item';
+      item.setAttribute('data-platform', platformKey);
+      item.draggable = true;
+      item.innerHTML = `
+        <div class="drag-handle">≡</div>
+        <img class="platform-icon" src="${platform.icon}" alt="${platform.name}">
+        <span class="platform-name">${platform.name}</span>
+        <label class="platform-switch">
+          <input type="checkbox" ${this.enabledPlatforms.includes(platformKey) ? 'checked' : ''}>
+          <span class="switch-slider"></span>
+        </label>
+      `;
+      sortable.appendChild(item);
     });
     
     // 添加拖拽事件监听器
@@ -626,6 +642,11 @@ class LiveAssistant {
     
     // 更新平台顺序
     this.platformOrder = newOrder;
+    
+    // 过滤掉无效的平台ID，确保只保留有效的平台
+    this.enabledPlatforms = this.enabledPlatforms.filter(platformKey => 
+      this.platforms[platformKey] !== undefined
+    );
     
     // 获取悬浮按钮开关状态
     const floatingButtonToggle = document.getElementById('floatingButtonToggle');
