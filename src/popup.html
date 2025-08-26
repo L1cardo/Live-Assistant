@@ -724,21 +724,20 @@
   
   <!-- 设置区域 -->
   <div id="settingsPanel" class="settings-panel">
+    <!-- 悬浮按钮显示开关 -->
+    <div class="platform-item" style="margin-bottom: 16px;">
+      <span style="font-size: 15px; font-weight: 600; flex: 1;">显示悬浮按钮</span>
+      <label class="platform-switch">
+        <input type="checkbox" id="floatingButtonToggle">
+        <span class="switch-slider"></span>
+      </label>
+    </div>
+    
     <h3 class="settings-heading">平台显示顺序设置</h3>
     <p class="settings-description">拖拽平台项来调整显示顺序：</p>
     <ul class="platform-sortable-list" id="platformSortable">
       <!-- 平台项将通过JavaScript动态生成 -->
     </ul>
-    
-    <!-- 悬浮按钮显示开关 -->
-    <div class="floating-button-setting" style="margin-top: 20px; padding: 12px; background: #f8f9fa; border-radius: 8px;">
-      <label class="platform-switch" style="display: flex; align-items: center; gap: 12px;">
-        <span style="flex: 1;">显示悬浮按钮</span>
-        <input type="checkbox" id="floatingButtonToggle">
-        <span class="switch-slider"></span>
-      </label>
-      <p class="settings-description" style="margin-top: 8px; font-size: 12px;">开启后将在页面右下角显示快速导航按钮</p>
-    </div>
     
     <button class="apply-settings-btn" id="applySettingsBtn">应用设置</button>
   </div>
