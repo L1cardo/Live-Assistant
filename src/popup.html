@@ -421,6 +421,125 @@
       font-size: 16px;
     }
     
+    /* 悬浮按钮样式 */
+    .floating-buttons {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 1000;
+    }
+    
+    .floating-button {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #4285f4;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      transition: all 0.2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .floating-button:hover {
+      background: #3367d6;
+      transform: scale(1.1);
+    }
+    
+    .floating-button::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      border-radius: 50%;
+      box-shadow: 0 0 0 2px rgba(255,255,255,0.3);
+    }
+    
+    .floating-button-icon {
+      width: 20px;
+      height: 20px;
+      object-fit: contain;
+    }
+    
+    /* 特别处理B站图标，强制显示为白色 */
+    .bilibili-icon {
+      filter: brightness(0) invert(1); /* 强制让B站图标显示为白色 */
+    }
+    
+    .floating-button-label {
+      position: absolute;
+      bottom: 50px;
+      right: 0;
+      background: #333;
+      color: white;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      white-space: nowrap;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.2s ease;
+      transform: translateY(5px);
+    }
+    
+    .floating-button:hover .floating-button-label {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+    
+    /* 返回顶部按钮 */
+    .top-button {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #4285f4;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      transition: all 0.2s ease;
+      position: relative;
+    }
+    
+    .top-button:hover {
+      background: #3367d6;
+      transform: scale(1.1);
+    }
+    
+    .top-button::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      border-radius: 50%;
+      box-shadow: 0 0 0 2px rgba(255,255,255,0.3);
+    }
+    
+    .top-button-icon {
+      width: 20px;
+      height: 20px;
+      object-fit: contain;
+    }
+    
+    /* 悬浮按钮容器 */
+    .floating-buttons-container {
+      position: relative;
+    }
+    
     /* 设置区域样式 */
     .settings-panel {
       display: none;
@@ -610,6 +729,17 @@
     <ul class="platform-sortable-list" id="platformSortable">
       <!-- 平台项将通过JavaScript动态生成 -->
     </ul>
+    
+    <!-- 悬浮按钮显示开关 -->
+    <div class="floating-button-setting" style="margin-top: 20px; padding: 12px; background: #f8f9fa; border-radius: 8px;">
+      <label class="platform-switch" style="display: flex; align-items: center; gap: 12px;">
+        <span style="flex: 1;">显示悬浮按钮</span>
+        <input type="checkbox" id="floatingButtonToggle">
+        <span class="switch-slider"></span>
+      </label>
+      <p class="settings-description" style="margin-top: 8px; font-size: 12px;">开启后将在页面右下角显示快速导航按钮</p>
+    </div>
+    
     <button class="apply-settings-btn" id="applySettingsBtn">应用设置</button>
   </div>
   

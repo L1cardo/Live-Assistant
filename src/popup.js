@@ -30,6 +30,7 @@ class LiveAssistant {
 
     this.platformOrder = Object.keys(this.platforms);
     this.enabledPlatforms = Object.keys(this.platforms); // 默认所有平台都启用
+    this.floatingButtonsVisible = true; // 默认悬浮按钮可见
     this.init();
   }
 
@@ -130,7 +131,7 @@ class LiveAssistant {
   // 从本地存储加载缓存数据
   async loadCachedData() {
     try {
-      const result = await chrome.storage.local.get(['cachedStreamers', 'cachedTimestamp', 'platformOrder', 'enabledPlatforms']);
+      const result = await chrome.storage.local.get(['cachedStreamers', 'cachedTimestamp', 'platformOrder', 'enabledPlatforms', 'floatingButtonsVisible']);
       if (result.cachedStreamers) {
         // 如果有自定义平台顺序，则使用它
         if (result.platformOrder) {
@@ -139,6 +140,10 @@ class LiveAssistant {
         // 如果有启用的平台设置，则使用它
         if (result.enabledPlatforms) {
           this.enabledPlatforms = result.enabledPlatforms;
+        }
+        // 如果有悬浮按钮显示设置，则使用它
+        if (result.floatingButtonsVisible !== undefined) {
+          this.floatingButtonsVisible = result.floatingButtonsVisible;
         }
         // 显示缓存数据
         this.renderStreamers(result.cachedStreamers);
@@ -169,7 +174,7 @@ class LiveAssistant {
       const liveStreamers = platformData?.data ? platformData.data.filter(streamer => streamer.isLive) : [];
 
       html += `
-        <div class="platform-section">
+        <div class="platform-section" id="platform-${platformKey}">
           <div class="platform-title">
             <img class="platform-icon" src="${platformInfo.icon}" alt="${platformInfo.name}">
             <span class="platform-name">${platformInfo.name}</span>
@@ -247,6 +252,9 @@ class LiveAssistant {
 
     content.innerHTML = html;
 
+    // 创建悬浮按钮
+    this.createFloatingButtons();
+
     // 绑定点击事件
     document.querySelectorAll('.streamer-item').forEach(item => {
       item.addEventListener('click', () => {
@@ -290,6 +298,98 @@ class LiveAssistant {
         img.style.display = 'none';
       });
     });
+  }
+  
+  // 创建悬浮按钮
+  createFloatingButtons() {
+    // 移除已存在的浮动按钮容器
+    const existingContainer = document.querySelector('.floating-buttons-container');
+    if (existingContainer) {
+      existingContainer.remove();
+    }
+
+    // 创建浮动按钮容器
+    const container = document.createElement('div');
+    container.className = 'floating-buttons-container';
+    
+    // 创建浮动按钮容器
+    const buttonsContainer = document.createElement('div');
+    buttonsContainer.className = 'floating-buttons';
+    
+    // 为每个启用的平台创建按钮
+    this.enabledPlatforms.forEach(platformKey => {
+      const platformInfo = this.platforms[platformKey];
+      const button = document.createElement('button');
+      button.className = 'floating-button';
+      button.title = platformInfo.name;
+      button.dataset.platform = platformKey;
+      
+      // 创建图标
+      const icon = document.createElement('img');
+      icon.className = 'floating-button-icon';
+      // 为B站添加特殊类名
+      if (platformKey === 'bilibili') {
+        icon.classList.add('bilibili-icon');
+      }
+      icon.src = platformInfo.icon;
+      icon.alt = platformInfo.name;
+      
+      // 创建标签
+      const label = document.createElement('span');
+      label.className = 'floating-button-label';
+      label.textContent = platformInfo.name;
+      
+      // 添加点击事件
+      button.addEventListener('click', () => {
+        this.scrollToPlatform(platformKey);
+      });
+      
+      button.appendChild(icon);
+      button.appendChild(label);
+      buttonsContainer.appendChild(button);
+    });
+    
+    // 添加返回顶部按钮
+    const topButton = document.createElement('button');
+    topButton.className = 'top-button';
+    topButton.title = '返回顶部';
+    
+    // 创建返回顶部图标
+    const topIcon = document.createElement('img');
+    topIcon.className = 'top-button-icon';
+    topIcon.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M7 14l5-5 5 5z"/></svg>';
+    topIcon.alt = '返回顶部';
+    
+    // 添加返回顶部点击事件
+    topButton.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+    
+    topButton.appendChild(topIcon);
+    buttonsContainer.appendChild(topButton);
+    
+    container.appendChild(buttonsContainer);
+    document.body.appendChild(container);
+    
+    // 根据设置决定是否显示悬浮按钮
+    const floatingButtonsContainer = document.querySelector('.floating-buttons-container');
+    if (floatingButtonsContainer) {
+      floatingButtonsContainer.style.display = this.floatingButtonsVisible ? 'block' : 'none';
+    }
+  }
+  
+  // 滚动到指定平台
+  scrollToPlatform(platformKey) {
+    const platformElement = document.getElementById(`platform-${platformKey}`);
+    if (platformElement) {
+      platformElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      
+      // 添加高亮效果
+      platformElement.style.backgroundColor = '#e3f2fd';
+      setTimeout(() => {
+        platformElement.style.backgroundColor = '';
+      }, 2000);
+    }
   }
   
   // 格式化数字显示
@@ -370,6 +470,7 @@ class LiveAssistant {
     const settingsBtn = document.getElementById('settingsBtn');
     const contentDiv = document.getElementById('content');
     const refreshBtn = document.getElementById('refreshBtn');
+    const floatingButtonsContainer = document.querySelector('.floating-buttons-container');
     
     // 切换显示状态
     if (settingsPanel.style.display === 'none' || settingsPanel.style.display === '') {
@@ -378,6 +479,10 @@ class LiveAssistant {
       contentDiv.style.display = 'none';
       settingsBtn.textContent = '返回';
       refreshBtn.style.display = 'none'; // 隐藏刷新按钮
+      // 隐藏悬浮按钮
+      if (floatingButtonsContainer) {
+        floatingButtonsContainer.style.display = 'none';
+      }
       // 立即渲染设置项
       this.renderSettings();
     } else {
@@ -386,6 +491,10 @@ class LiveAssistant {
       contentDiv.style.display = 'block';
       settingsBtn.textContent = '设置';
       refreshBtn.style.display = 'inline-block'; // 显示刷新按钮
+      // 显示悬浮按钮
+      if (floatingButtonsContainer) {
+        floatingButtonsContainer.style.display = 'block';
+      }
     }
   }
   
@@ -420,6 +529,15 @@ class LiveAssistant {
     
     // 为开关添加事件监听器
     this.setupSwitchListeners();
+    
+    // 初始化悬浮按钮开关状态
+    // 延迟执行，确保DOM已经更新
+    setTimeout(() => {
+      const floatingButtonToggle = document.getElementById('floatingButtonToggle');
+      if (floatingButtonToggle) {
+        floatingButtonToggle.checked = this.floatingButtonsVisible;
+      }
+    }, 0);
   }
   
   // 为平台开关添加事件监听器
@@ -427,7 +545,10 @@ class LiveAssistant {
     const switchInputs = document.querySelectorAll('.platform-switch input');
     switchInputs.forEach(input => {
       input.addEventListener('change', (e) => {
-        const platformKey = e.target.closest('.platform-item').getAttribute('data-platform');
+        const platformItem = e.target.closest('.platform-item');
+        if (!platformItem) return; // 安全检查
+        
+        const platformKey = platformItem.getAttribute('data-platform');
         const isChecked = e.target.checked;
         
         if (isChecked) {
@@ -506,10 +627,17 @@ class LiveAssistant {
     // 更新平台顺序
     this.platformOrder = newOrder;
     
+    // 获取悬浮按钮开关状态
+    const floatingButtonToggle = document.getElementById('floatingButtonToggle');
+    if (floatingButtonToggle) {
+      this.floatingButtonsVisible = floatingButtonToggle.checked;
+    }
+    
     // 保存到本地存储
     chrome.storage.local.set({ 
       platformOrder: newOrder,
-      enabledPlatforms: this.enabledPlatforms
+      enabledPlatforms: this.enabledPlatforms,
+      floatingButtonsVisible: this.floatingButtonsVisible
     });
     
     // 重新渲染主界面
