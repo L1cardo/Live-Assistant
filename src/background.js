@@ -126,12 +126,13 @@ class DouyuAPI {
         name: item.nickname || item.room_name,
         avatar: avatarUrl,
         url: `https://www.douyu.com/${item.room_id}`,
-        isLive: item.show_status === 1,
+        isLive: item.show_status === 1 && item.videoLoop === 0,
         title: item.room_name,
         platform: 'douyu',
         viewers: item.online,
         followers: 0, // 斗鱼关注列表API不返回粉丝数
-        startTime: item.show_time ? new Date(item.show_time * 1000) : null // 时间戳转换
+        startTime: item.show_time ? new Date(item.show_time * 1000) : null, // 时间戳转换
+        thumbnail: item.room_src // 添加缩略图URL
       };
 
       console.log('解析的热度:', streamer.viewers, '原始数据:', item.online);

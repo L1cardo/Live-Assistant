@@ -199,8 +199,17 @@ class LiveAssistant {
           liveStreamers.forEach(streamer => {
             console.log('渲染主播:', streamer.name, '头像URL:', streamer.avatar);
 
+            // 对于斗鱼平台，添加缩略图显示
+            let thumbnailHtml = '';
+            if (streamer.platform === 'douyu' && streamer.thumbnail) {
+              thumbnailHtml = `
+                <img class="streamer-thumbnail" src="${streamer.thumbnail}" alt="${streamer.name} 缩略图">
+              `;
+            }
+
             html += `
               <li class="streamer-item live" data-url="${streamer.url}">
+                ${thumbnailHtml}
                 <img class="streamer-avatar" src="${streamer.avatar || defaultAvatar}" alt="${streamer.name}" data-default="${defaultAvatar}" data-original="${streamer.avatar}">
                 <div class="streamer-info">
                   <div class="streamer-name">${streamer.name}</div>
