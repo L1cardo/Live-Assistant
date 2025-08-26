@@ -395,12 +395,6 @@ class LiveAssistant {
     const platformElement = document.getElementById(`platform-${platformKey}`);
     if (platformElement) {
       platformElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      
-      // 添加高亮效果
-      platformElement.style.backgroundColor = '#e3f2fd';
-      setTimeout(() => {
-        platformElement.style.backgroundColor = '';
-      }, 2000);
     }
   }
   

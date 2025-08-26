@@ -704,6 +704,26 @@
         background: #3367d6;
       }
     }
+    
+    .message-container {
+      display: none;
+      position: fixed;
+      top: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 12px 24px;
+      background: #4285f4;
+      color: white;
+      border-radius: 6px;
+      z-index: 1000;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    
+    .floating-button-label-span {
+      font-size: 15px;
+      font-weight: 600;
+      flex: 1;
+    }
   </style>
 </head>
 <body>
@@ -720,13 +740,13 @@
   </div>
   
   <!-- 提示信息容器 -->
-  <div id="messageContainer" class="message-container" style="display: none; position: fixed; top: 16px; left: 50%; transform: translateX(-50%); padding: 12px 24px; background: #4285f4; color: white; border-radius: 6px; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.15);"></div>
+  <div id="messageContainer" class="message-container"></div>
   
   <!-- 设置区域 -->
   <div id="settingsPanel" class="settings-panel">
     <!-- 悬浮按钮显示开关 -->
-    <div class="platform-item" style="margin-bottom: 16px;">
-      <span style="font-size: 15px; font-weight: 600; flex: 1;">显示悬浮按钮</span>
+    <div class="platform-item">
+      <span class="floating-button-label-span">显示悬浮按钮</span>
       <label class="platform-switch">
         <input type="checkbox" id="floatingButtonToggle">
         <span class="switch-slider"></span>
