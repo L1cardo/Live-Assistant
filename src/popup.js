@@ -43,8 +43,12 @@ class LiveAssistant {
   }
 
   bindEvents() {
-    document.getElementById('refreshBtn').addEventListener('click', () => {
-      this.loadFollowedStreamers();
+    document.getElementById('refreshBtn').addEventListener('click', (event) => {
+      // 显示加载动画并执行后台刷新
+      this.showRefreshLoading();
+      
+      // 立即执行后台刷新
+      this.refreshInBackground();
     });
     
     document.getElementById('settingsBtn').addEventListener('click', () => {
@@ -59,11 +63,6 @@ class LiveAssistant {
   async loadFollowedStreamers(isBackgroundUpdate = false) {
     const content = document.getElementById('content');
     
-    // 如果不是后台更新，显示加载状态
-    if (!isBackgroundUpdate) {
-      content.innerHTML = '<div class="loading">正在加载关注列表...</div>';
-    }
-    
     try {
       console.log('开始获取关注列表...');
       // 获取所有平台数据
@@ -77,10 +76,11 @@ class LiveAssistant {
     } catch (error) {
       console.error('加载失败:', error);
       if (!isBackgroundUpdate) {
-        content.innerHTML = '<div class="empty">加载失败，请稍后重试<br>请检查控制台查看详细错误信息</div>';
+        content.innerHTML = '<div class="empty">刷新失败，请稍后重试<br>请检查控制台查看详细错误信息</div>';
       }
     }
   }
+
 
   async getFollowedStreamers() {
     const results = {};
@@ -662,6 +662,47 @@ class LiveAssistant {
     this.showMessage('设置已保存！');
   }
   
+  // 在后台刷新数据
+  async refreshInBackground() {
+    try {
+      // 获取最新数据
+      const followedData = await this.getFollowedStreamers();
+      
+      // 缓存新数据
+      await this.cacheData(followedData);
+      
+      // 更新UI显示（即使是在后台刷新，也要更新显示）
+      this.renderStreamers(followedData);
+      
+      console.log('后台刷新完成');
+    } catch (error) {
+      console.error('后台刷新失败:', error);
+    } finally {
+      // 无论成功与否，都恢复按钮状态
+      this.resetRefreshButton();
+    }
+  }
+
+  // 显示刷新按钮的加载状态
+  showRefreshLoading() {
+    const refreshBtn = document.getElementById('refreshBtn');
+    // 保存原始文本
+    refreshBtn.dataset.originalText = refreshBtn.textContent;
+    // 显示加载动画
+    refreshBtn.innerHTML = '<span class="refresh-spinner"></span>刷新中';
+    refreshBtn.disabled = true;
+  }
+
+  // 恢复刷新按钮的正常状态
+  resetRefreshButton() {
+    const refreshBtn = document.getElementById('refreshBtn');
+    // 恢复原始文本
+    if (refreshBtn.dataset.originalText) {
+      refreshBtn.textContent = refreshBtn.dataset.originalText;
+    }
+    refreshBtn.disabled = false;
+  }
+
   // 显示页面内提示信息
   showMessage(message) {
     const messageContainer = document.getElementById('messageContainer');
