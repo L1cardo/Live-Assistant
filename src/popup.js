@@ -199,9 +199,9 @@ class LiveAssistant {
           liveStreamers.forEach(streamer => {
             console.log('渲染主播:', streamer.name, '头像URL:', streamer.avatar);
 
-            // 对于斗鱼平台，添加缩略图显示
+            // 对于斗鱼和虎牙平台，添加缩略图显示
             let thumbnailHtml = '';
-            if (streamer.platform === 'douyu' && streamer.thumbnail) {
+            if (streamer.thumbnail) {
               thumbnailHtml = `
                 <img class="streamer-thumbnail" src="${streamer.thumbnail}" alt="${streamer.name} 缩略图">
               `;
@@ -210,16 +210,22 @@ class LiveAssistant {
             html += `
               <li class="streamer-item live" data-url="${streamer.url}">
                 ${thumbnailHtml}
-                <img class="streamer-avatar" src="${streamer.avatar || defaultAvatar}" alt="${streamer.name}" data-default="${defaultAvatar}" data-original="${streamer.avatar}">
-                <div class="streamer-info">
-                  <div class="streamer-name">${streamer.name}</div>
-                  <div class="streamer-title">
-                    ${streamer.title || '直播中...'}
+                <div class="streamer-content">
+                  <div class="streamer-info-wrapper">
+                    <img class="streamer-avatar" src="${streamer.avatar || defaultAvatar}" alt="${streamer.name}" data-default="${defaultAvatar}" data-original="${streamer.avatar}">
+                    <div class="streamer-basic-info">
+                      <div class="streamer-name">${streamer.name}</div>
+                      <div class="streamer-title">
+                        ${streamer.title || '直播中...'}
+                      </div>
+                    </div>
                   </div>
-                  <div class="streamer-stats">
-                    ${this.getViewerStats(streamer)}
-                    ${streamer.platform !== 'bilibili' && streamer.platform !== 'douyu' ? `<span class="stat-item"><span class="icon">❤️</span>${this.formatNumber(streamer.followers || 0)} 粉丝</span>` : ''}
-                    ${streamer.startTime ? `<span class="stat-item"><span class="icon">⏰</span>${this.formatStartTime(streamer.startTime)}</span>` : ''}
+                  <div class="streamer-stats-wrapper">
+                    <div class="streamer-stats">
+                      ${this.getViewerStats(streamer)}
+                      ${streamer.platform !== 'bilibili' && streamer.platform !== 'douyu' ? `<span class="stat-item"><span class="icon">❤️</span>${this.formatNumber(streamer.followers || 0)}粉丝</span>` : ''}
+                      ${streamer.liveTime ? `<span class="stat-item"><span class="icon">⏰</span>${this.formatStartTime(streamer.liveTime)}</span>` : ''}
+                    </div>
                   </div>
                 </div>
               </li>
@@ -304,11 +310,11 @@ class LiveAssistant {
     if (streamer.platform === 'douyu' || streamer.platform === 'huya') {
       // 斗鱼和虎牙的viewers字段实际是热度，强制显示
       const heat = streamer.viewers || 0;
-      return `<span class="stat-item"><span class="icon">🔥</span>${this.formatNumber(heat)} 热度</span>`;
+      return `<span class="stat-item"><span class="icon">🔥</span>${this.formatNumber(heat)}热度</span>`;
     } else {
       // 其他平台显示观看人数
       const viewers = streamer.viewers || 0;
-      return viewers > 0 ? `<span class="stat-item"><span class="icon">👥</span>${this.formatNumber(viewers)} 观看</span>` : '';
+      return viewers > 0 ? `<span class="stat-item"><span class="icon">👥</span>${this.formatNumber(viewers)}观看</span>` : '';
     }
   }
   
@@ -317,37 +323,104 @@ class LiveAssistant {
     if (!timeStr) return '';
     
     try {
-      // 处理不同的时间格式
-      let time;
-      if (typeof timeStr === 'string') {
-        // 如果是时间戳字符串，转换为数字
-        if (/^\d+$/.test(timeStr)) {
-          time = new Date(parseInt(timeStr) * 1000); // 假设是秒级时间戳
+      // 处理B站的live_time（秒数）情况
+      // B站的live_time是已开播的秒数，直接用作持续时间
+      if (typeof timeStr === 'number') {
+        // B站live_time是秒数，合理范围应该是几秒到几百万秒（几天到几个月）
+        if (timeStr > 0 && timeStr < 315360000) { // 10年以内（315360000秒）
+          const seconds = timeStr;
+          const hours = Math.floor(seconds / 3600);
+          const minutes = Math.floor((seconds % 3600) / 60);
+          
+          if (hours > 0) {
+            return `已播${hours}小时${minutes}分钟`;
+          } else if (minutes > 0) {
+            return `已播${minutes}分钟`;
+          } else {
+            return '刚开始';
+          }
         } else {
-          time = new Date(timeStr);
+          // 如果不在合理范围内，可能不是live_time而是其他时间戳，按常规处理
+          const startTime = timeStr > 1000000000000 ? new Date(timeStr) : new Date(timeStr * 1000);
+          const now = new Date();
+          const diff = now - startTime;
+          
+          if (diff < 0) {
+            return '即将开始';
+          }
+          
+          const hours = Math.floor(diff / (1000 * 60 * 60));
+          const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+          
+          if (hours > 0) {
+            return `已播${hours}小时${minutes}分钟`;
+          } else if (minutes > 0) {
+            return `已播${minutes}分钟`;
+          } else {
+            return '刚开始';
+          }
         }
-      } else if (typeof timeStr === 'number') {
-        // 如果是数字，判断是秒还是毫秒
-        time = timeStr > 1000000000000 ? new Date(timeStr) : new Date(timeStr * 1000);
+      } else if (typeof timeStr === 'string') {
+        // 字符串时间
+        if (/^\d+$/.test(timeStr)) {
+          const numTime = parseInt(timeStr);
+          // 如果是合理范围的秒数（B站live_time特点）
+          if (numTime > 0 && numTime < 315360000) {
+            const seconds = numTime;
+            const hours = Math.floor(seconds / 3600);
+            const minutes = Math.floor((seconds % 3600) / 60);
+            
+            if (hours > 0) {
+              return `已播${hours}小时${minutes}分钟`;
+            } else if (minutes > 0) {
+              return `已播${minutes}分钟`;
+            } else {
+              return '刚开始';
+            }
+          } else {
+            // 不在合理秒数范围内，按时间戳处理
+            const startTime = new Date(numTime * 1000);
+            const now = new Date();
+            const diff = now - startTime;
+            
+            if (diff < 0) {
+              return '即将开始';
+            }
+            
+            const hours = Math.floor(diff / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            
+            if (hours > 0) {
+              return `已播${hours}小时${minutes}分钟`;
+            } else if (minutes > 0) {
+              return `已播${minutes}分钟`;
+            } else {
+              return '刚开始';
+            }
+          }
+        } else {
+          // 非数字字符串，按常规时间处理
+          const startTime = new Date(timeStr);
+          const now = new Date();
+          const diff = now - startTime;
+          
+          if (diff < 0) {
+            return '即将开始';
+          }
+          
+          const hours = Math.floor(diff / (1000 * 60 * 60));
+          const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+          
+          if (hours > 0) {
+            return `已播${hours}小时${minutes}分钟`;
+          } else if (minutes > 0) {
+            return `已播${minutes}分钟`;
+          } else {
+            return '刚开始';
+          }
+        }
       } else {
         return '';
-      }
-      
-      const now = new Date();
-      const diff = now - time;
-      
-      // 计算开播时长
-      const hours = Math.floor(diff / (1000 * 60 * 60));
-      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-      
-      if (diff < 0) {
-        return '即将开始';
-      } else if (hours > 0) {
-        return `已播 ${hours}小时${minutes}分钟`;
-      } else if (minutes > 0) {
-        return `已播 ${minutes}分钟`;
-      } else {
-        return '刚开始';
       }
     } catch (error) {
       console.error('时间格式化错误:', error, timeStr);

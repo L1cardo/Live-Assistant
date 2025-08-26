@@ -239,7 +239,8 @@ class HuyaAPI {
       platform: 'huya',
       viewers: item.totalCount || 0, // totalCount代表热度
       followers: item.activityCount || 0, // 根据反馈，粉丝字段是activityCount
-      startTime: item.startTime ? new Date(item.startTime * 1000) : null
+      startTime: item.startTime ? new Date(item.startTime * 1000) : null,
+      thumbnail: item.screenshot // 添加虎牙缩略图支持
     }));
   }
 }
@@ -267,12 +268,10 @@ class BilibiliAPI {
       console.log('B站请求cookie:', cookieStr);
 
       // B站直播关注列表API
-      const response = await fetch('https://api.live.bilibili.com/xlive/web-ucenter/user/following?page=1&page_size=29', {
+      const response = await fetch('https://api.live.bilibili.com/xlive/web-ucenter/v1/xfetter/GetWebList', {
         method: 'GET',
         headers: {
           'Cookie': cookieStr,
-          'Referer': 'https://live.bilibili.com/',
-          'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
         }
       });
 
@@ -310,17 +309,24 @@ class BilibiliAPI {
       return [];
     }
 
-    return data.data.list.map(item => ({
-      name: item.uname,
-      avatar: item.face,
-      url: `https://live.bilibili.com/${item.roomid}`,
-      isLive: item.live_status === 1,
-      title: item.title || item.uname,
-      platform: 'bilibili',
-      viewers: item.online || 0,
-      followers: item.attention || 0,
-      startTime: item.live_time
-    }));
+    return data.data.list.map(item => {
+      // 修正B站API数据结构的处理
+      const streamer = {
+        name: item.uname || '未知主播',
+        avatar: item.face,
+        url: `https://live.bilibili.com/${item.roomid || item.room_id}`,
+        isLive: item.live_status === 1,
+        title: item.title || '直播中...',
+        platform: 'bilibili',
+        viewers: item.online || 0,
+        followers: 0, //b站无法索取粉丝数
+        liveTime: item.live_time, // 重命名为更清晰的名称
+        thumbnail: item.keyframe || item.cover_from_user
+      };
+
+      console.log('解析后的B站主播:', streamer);
+      return streamer;
+    });
   }
 }
 

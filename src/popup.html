@@ -317,6 +317,38 @@
       flex-wrap: wrap;
     }
     
+    /* 新增的样式用于满足布局要求 */
+    .streamer-info-wrapper {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 6px;
+    }
+    
+    .streamer-basic-info {
+      flex: 1;
+    }
+    
+    .streamer-stats-wrapper {
+      margin-top: 4px;
+    }
+    
+    /* 确保info和stats垂直排列 */
+    .streamer-content {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+    
+    /* 正确的最终实现 */
+    .streamer-item {
+      flex-direction: row;
+      align-items: flex-start;
+    }
+    
+    .streamer-info-wrapper {
+      margin-bottom: 4px;
+    }
+    
     .stat-item {
       font-size: 12px;
       color: #9ca3af;
@@ -328,6 +360,45 @@
     .stat-item .icon {
       font-size: 10px;
       margin-right: 1px;
+    }
+    
+    /* 修复内容超出边框的问题 */
+    .streamer-content {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-width: 0; /* 关键：允许元素收缩到其内容宽度以下 */
+    }
+    
+    .streamer-info-wrapper {
+      flex: 1;
+      min-width: 0; /* 关键：允许子元素收缩 */
+    }
+    
+    .streamer-basic-info {
+      flex: 1;
+      min-width: 0; /* 关键：允许子元素收缩 */
+    }
+    
+    .streamer-name {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    
+    .streamer-title {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    
+    .streamer-stats {
+      flex-wrap: wrap;
+    }
+    
+    .streamer-stats-wrapper {
+      flex: 1;
+      min-width: 0; /* 关键：允许子元素收缩 */
     }
 
     .loading {
