@@ -70,11 +70,7 @@ class DouyuAPI {
       const response = await fetch('https://www.douyu.com/wgapi/livenc/liveweb/follow/list?page=1&limit=50', {
         method: 'GET',
         headers: {
-          'Cookie': cookieStr,
-          'Referer': 'https://www.douyu.com/',
-          'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-          'Accept': 'application/json, text/plain, */*',
-          'X-Requested-With': 'XMLHttpRequest'
+          'Cookie': cookieStr
         }
       });
 
@@ -168,13 +164,7 @@ class HuyaAPI {
       const response = await fetch(`https://fw.huya.com/dispatch?do=subscribeList&uid=${uid}&page=1&pageSize=22`, {
         method: 'GET',
         headers: {
-          'Cookie': cookieStr,
-          'Referer': 'https://www.huya.com/',
-          'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-          'Accept': 'application/json, text/plain, */*',
-          'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
-          'Host': 'fw.huya.com',
-          'Connection': 'keep-alive'
+          'Cookie': cookieStr
         }
       });
 
@@ -320,7 +310,7 @@ class BilibiliAPI {
         platform: 'bilibili',
         viewers: item.online || 0,
         followers: 0, //b站无法索取粉丝数
-        liveTime: item.live_time, // 重命名为更清晰的名称
+        liveTime: item.live_time,
         thumbnail: item.keyframe || item.cover_from_user
       };
 
@@ -330,17 +320,55 @@ class BilibiliAPI {
   }
 }
 
-// 抖音 API (简化实现)
+// 抖音 API
 class DouyinAPI {
   async getFollowedStreamers() {
-    // 抖音的API比较复杂，这里提供基础框架
     try {
-      const cookies = await this.getCookies('https://live.douyin.com');
-      // 抖音需要更复杂的认证机制
+      const cookies = await this.getCookies('https://www.douyin.com');
+      console.log('抖音cookies:', cookies.map(c => c.name));
+
+      const cookieStr = cookies.map(c => `${c.name}=${c.value}`).join('; ');
+      console.log('抖音请求cookie:', cookieStr);
+
+      // 抖音关注列表API
+      const response = await fetch('https://www.douyin.com/webcast/web/feed/follow/?aid=6383&scene=aweme_pc_follow_top', {
+        method: 'GET',
+        headers: {
+          'Cookie': cookieStr
+        }
+      });
+
+      if (!response.ok) {
+        console.error('抖音API请求失败:', response.status, response.statusText);
+        // 尝试获取响应文本以调试
+        const responseText = await response.text();
+        console.error('抖音API响应文本:', responseText);
+        return {
+          data: [],
+          isLoggedIn: false,
+          loginUrl: 'https://www.douyin.com'
+        };
+      }
+
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        console.error('抖音API返回非JSON内容:', contentType);
+        const responseText = await response.text();
+        console.error('抖音API响应文本:', responseText);
+        return {
+          data: [],
+          isLoggedIn: false,
+          loginUrl: 'https://www.douyin.com'
+        };
+      }
+
+      const data = await response.json();
+      console.log('抖音API返回:', data);
+
+      // 解析抖音返回的数据
       return {
-        data: [],
-        isLoggedIn: false,
-        loginUrl: 'https://www.douyin.com'
+        data: this.parseStreamers(data),
+        isLoggedIn: true
       };
     } catch (error) {
       console.error('抖音API错误:', error);
@@ -355,6 +383,46 @@ class DouyinAPI {
   async getCookies(url) {
     return new Promise((resolve) => {
       chrome.cookies.getAll({ url }, resolve);
+    });
+  }
+
+  parseStreamers(data) {
+    // 根据提供的API响应格式解析数据
+    if (!data || !data.data || !data.data.data) {
+      console.log('抖音数据格式错误:', data);
+      return [];
+    }
+
+    return data.data.data.map(item => {
+      const room = item.room;
+      
+      // 获取主播信息
+      const owner = room.owner || {};
+      const nickname = owner.nickname || '未知主播';
+      const avatar = owner.avatar_thumb?.url_list?.[0] || '';
+      
+      // 获取直播信息
+      const title = room.title || '直播中...';
+      const viewers = room.stats?.user_count_str || '0';
+      const isLive = room.status === 0; // 0表示直播中
+      
+      // 获取封面图片
+      const coverUrl = room.cover?.url_list?.[0] || '';
+
+      const streamer = {
+        name: nickname,
+        avatar: avatar,
+        url: `https://live.douyin.com/${item.web_rid}`,
+        isLive: isLive,
+        title: title,
+        platform: 'douyin',
+        viewers: viewers,
+        followers: 0, // 抖音API不返回粉丝数
+        thumbnail: coverUrl,
+      };
+
+      console.log('解析后的抖音主播:', streamer);
+      return streamer;
     });
   }
 }
