@@ -125,7 +125,8 @@ class DouyuAPI {
         viewers: item.online,
         followers: 0, // 斗鱼关注列表API不返回粉丝数
         startTime: item.show_time ? new Date(item.show_time * 1000) : null, // 时间戳转换
-        thumbnail: item.room_src, // 添加缩略图URL
+        thumbnail: item.room_src,
+        gameName: item.game_name || '',
       };
       return streamer;
     });
@@ -220,10 +221,11 @@ class HuyaAPI {
       isLive: item.isLive,
       title: item.intro,
       platform: "huya",
-      viewers: item.totalCount || 0, // totalCount代表热度
-      followers: item.activityCount || 0, // 根据反馈，粉丝字段是activityCount
+      viewers: item.totalCount || 0,
+      followers: item.activityCount || 0,
       startTime: item.startTime ? new Date(item.startTime * 1000) : null,
-      thumbnail: item.screenshot, // 添加虎牙缩略图支持
+      thumbnail: item.screenshot,
+      gameName: item.gameName || '',
     }));
   }
 }
@@ -303,6 +305,7 @@ class BilibiliAPI {
         followers: 0, //b站无法索取粉丝数
         liveTime: item.live_time,
         thumbnail: item.keyframe || item.cover_from_user,
+        gameName: item.area_v2_name || '',
       };
 
       return streamer;
@@ -384,29 +387,17 @@ class DouyinAPI {
     return data.data.data.map((item) => {
       const room = item.room;
 
-      // 获取主播信息
-      const owner = room.owner || {};
-      const nickname = owner.nickname || "未知主播";
-      const avatar = owner.avatar_thumb?.url_list?.[0] || "";
-
-      // 获取直播信息
-      const title = room.title || "直播中...";
-      const viewers = room.stats?.user_count_str || "0";
-      const isLive = room.status === 0; // 0表示直播中
-
-      // 获取封面图片
-      const coverUrl = room.cover?.url_list?.[0] || "";
-
       const streamer = {
-        name: nickname,
-        avatar: avatar,
+        name: room.owner.nickname || "未知主播",
+        avatar: room.owner.avatar_thumb?.url_list?.[0] || "",
         url: `https://live.douyin.com/${item.web_rid}`,
-        isLive: isLive,
-        title: title,
+        isLive: room.status === 0,
+        title: room.title || "直播中...",
         platform: "douyin",
-        viewers: viewers,
+        viewers: room.stats?.user_count_str || "0",
         followers: 0, // 抖音API不返回粉丝数
-        thumbnail: coverUrl,
+        thumbnail: room.cover?.url_list?.[0] || "",
+        gameName: '', // 抖音无法获取游戏名称
       };
 
       return streamer;
@@ -534,7 +525,7 @@ class TwitchAPI {
 
     return followedStreams.map((node) => {
       const streamer = {
-        name: node.broadcaster.displayName || node.broadcaster.login,
+        name: node.broadcaster.displayName || '未知主播',
         avatar: node.broadcaster.profileImageURL,
         url: `https://www.twitch.tv/${node.broadcaster.login}`,
         isLive: true,
@@ -542,7 +533,8 @@ class TwitchAPI {
         platform: "twitch",
         viewers: node.viewersCount || 0,
         followers: 0, // Twitch API不直接提供粉丝数
-        thumbnail: `https://static-cdn.jtvnw.net/previews-ttv/live_user_${node.broadcaster.login}-320x180.jpg`, // 添加缩略图字段保持一致性
+        thumbnail: `https://static-cdn.jtvnw.net/previews-ttv/live_user_${node.broadcaster.login}-320x180.jpg`,
+        gameName: node.game.displayName || '',
       }
       
       return streamer;

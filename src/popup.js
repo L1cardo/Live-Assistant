@@ -220,22 +220,23 @@ class LiveAssistant {
               <li class="streamer-item live" data-url="${streamer.url}">
                 ${thumbnailHtml}
                 <div class="streamer-content">
-                  <div class="streamer-info-wrapper">
+                  <div class="streamer-info">
                     <img class="streamer-avatar" src="${streamer.avatar || defaultAvatar}" alt="${streamer.name}" data-default="${defaultAvatar}" data-original="${streamer.avatar}">
                     <div class="streamer-basic-info">
-                      <div class="streamer-name">${streamer.name}</div>
+                      <div class="streamer-name-container">
+                        <span class="streamer-name">${streamer.name}</span>
+                        <span class="game-name">${streamer.gameName}</span>
+                      </div>
                       <div class="streamer-title">
                         ${streamer.title || '直播中...'}
                       </div>
                     </div>
                   </div>
-                  <div class="streamer-stats-wrapper">
-                    <div class="streamer-stats">
-                      ${this.getViewerStats(streamer)}
-                      ${streamer.platform === 'huya' ? `<span class="stat-item"><span class="icon">❤️</span>${this.formatNumber(streamer.followers)}</span>` : ''}
-                      ${streamer.liveTime ? `<span class="stat-item"><span class="icon">⏰</span>${this.formatTime(streamer.liveTime)}</span>` : ''}
-                      ${streamer.startTime ? `<span class="stat-item"><span class="icon">⏰</span>${this.formatTime(streamer.startTime)}</span>` : ''}
-                    </div>
+                  <div class="streamer-stats">
+                    ${this.getViewerStats(streamer)}
+                    ${streamer.platform === 'huya' ? `<span class="stat-item"><span class="icon">❤️</span>${this.formatNumber(streamer.followers)}</span>` : ''}
+                    ${streamer.liveTime ? `<span class="stat-item"><span class="icon">⏰</span>${this.formatTime(streamer.liveTime)}</span>` : ''}
+                    ${streamer.startTime ? `<span class="stat-item"><span class="icon">⏰</span>${this.formatTime(streamer.startTime)}</span>` : ''}
                   </div>
                 </div>
               </li>

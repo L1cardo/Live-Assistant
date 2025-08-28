@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8">
   <style>
+    /* 基础样式 */
     body {
       width: 450px;
       min-height: 350px;
@@ -130,16 +131,23 @@
       margin: 0;
     }
     
+    /* 统一的主播卡片样式 */
     .streamer-item {
       display: flex;
       align-items: center;
       padding: 6px;
       margin-bottom: 6px;
-      background: #ffffff;
-      border: 1px solid #e1e5e9;
       border-radius: 8px;
       cursor: pointer;
       transition: all 0.2s ease;
+      flex-direction: row;
+      align-items: flex-start;
+    }
+    
+    /* 浅色主题 - 主播卡片 */
+    .streamer-item {
+      background: #ffffff;
+      border: 1px solid #e1e5e9;
       box-shadow: 0 1px 3px rgba(0,0,0,0.05);
     }
     
@@ -182,6 +190,11 @@
     }
     
     .streamer-avatar {
+      width: 60px;
+      height: 60px;
+      border-radius: 6px;
+      margin-right: 8px;
+      object-fit: cover;
       border: 2px solid #f3f4f6;
       box-shadow: 0 2px 4px rgba(0,0,0,0.1);
       background: #f9fafb;
@@ -242,8 +255,6 @@
       }
     }
     
-
-    
     .no-live, .no-follow {
       padding: 12px;
       text-align: center;
@@ -262,32 +273,45 @@
       }
     }
     
-    .streamer-avatar {
-      width: 60px;
-      height: 60px;
-      border-radius: 6px;
-      margin-right: 12px;
-      object-fit: cover;
-    }
-    
     .streamer-thumbnail {
       width: 160px;
       height: 90px;
       border-radius: 4px;
-      margin-right: 12px;
+      margin-right: 8px;
       object-fit: cover;
       box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
     
     .streamer-info {
       flex: 1;
+      min-width: 0; 
     }
     
     .streamer-name {
       font-size: 16px;
       font-weight: 500;
       color: #333;
-      margin-bottom: 3px;
+      flex-shrink: 0;
+      min-width: 0;
+    }
+    
+    .streamer-name-container {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      align-items: center;
+      margin-bottom: 2px;
+      gap: 20px;
+    }
+    
+    .game-name {
+      font-size: 12px;
+      color: #9ca3af;
+      flex-shrink: 1;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
     
     .streamer-title {
@@ -318,38 +342,19 @@
       display: flex;
       gap: 8px;
       flex-wrap: wrap;
+      height: 20px;
     }
     
-    /* 新增的样式用于满足布局要求 */
-    .streamer-info-wrapper {
+    .streamer-info {
       display: flex;
       align-items: flex-start;
-      margin-bottom: 6px;
+      flex: 1;
+      min-width: 0;
+      max-height: 64px;
     }
     
     .streamer-basic-info {
       flex: 1;
-    }
-    
-    .streamer-stats-wrapper {
-      margin-top: 4px;
-    }
-    
-    /* 确保info和stats垂直排列 */
-    .streamer-content {
-      display: flex;
-      flex-direction: column;
-      flex: 1;
-    }
-    
-    /* 正确的最终实现 */
-    .streamer-item {
-      flex-direction: row;
-      align-items: flex-start;
-    }
-    
-    .streamer-info-wrapper {
-      margin-bottom: 4px;
     }
     
     .stat-item {
@@ -365,22 +370,18 @@
       margin-right: 1px;
     }
     
-    /* 修复内容超出边框的问题 */
     .streamer-content {
       display: flex;
       flex-direction: column;
       flex: 1;
-      min-width: 0; /* 关键：允许元素收缩到其内容宽度以下 */
-    }
-    
-    .streamer-info-wrapper {
-      flex: 1;
-      min-width: 0; /* 关键：允许子元素收缩 */
+      min-width: 0;
+      height: 90px;
+      justify-content: space-between;
     }
     
     .streamer-basic-info {
       flex: 1;
-      min-width: 0; /* 关键：允许子元素收缩 */
+      min-width: 0;
     }
     
     .streamer-name {
@@ -396,15 +397,6 @@
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
       line-clamp: 2;
-    }
-    
-    .streamer-stats {
-      flex-wrap: wrap;
-    }
-    
-    .streamer-stats-wrapper {
-      flex: 1;
-      min-width: 0; /* 关键：允许子元素收缩 */
     }
 
     .loading {
@@ -462,8 +454,8 @@
     /* 悬浮按钮样式 */
     .floating-buttons {
       position: fixed;
-      bottom: 10px;
-      right: 10px;
+      bottom: 4px;
+      right: 2px;
       display: flex;
       flex-direction: column;
       gap: 8px;
@@ -607,7 +599,6 @@
       list-style: none;
       padding: 0;
       margin: 0;
-      max-height: 300px;
       overflow-y: auto;
       border-radius: 8px;
     }
