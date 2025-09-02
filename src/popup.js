@@ -31,11 +31,14 @@ class LiveAssistant {
     this.platformOrder = Object.keys(this.platforms);
     this.enabledPlatforms = Object.keys(this.platforms); // 默认所有平台都启用
     this.floatingButtonsVisible = true; // 默认悬浮按钮可见
+    this.favoriteStreamers = new Set(); // 收藏的主播集合
     this.init();
   }
 
   async init() {
-    // 先加载缓存数据
+    // 先加载收藏状态
+    await this.loadFavorites();
+    // 再加载缓存数据
     await this.loadCachedData();
     // 然后异步加载最新数据
     this.loadFollowedStreamers(true);
@@ -179,6 +182,9 @@ class LiveAssistant {
       // 计算正在直播的主播数量
       const liveStreamers = platformData?.data ? platformData.data.filter(streamer => streamer.isLive) : [];
 
+      // 先对主播进行排序，收藏的主播排在前面
+      const sortedLiveStreamers = this.sortFavoritesFirst(liveStreamers);
+
       html += `
         <div class="platform-section" id="platform-${platformKey}">
           <div class="platform-title">
@@ -207,7 +213,7 @@ class LiveAssistant {
 
           const defaultAvatar = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMTYiIGN5PSIxNiIgcj0iMTYiIGZpbGw9IiNlMGUwZTAiLz4KPGNpcmNsZSBjeD0iMTYiIGN5PSIxMiIgcj0iNSIgZmlsbD0iIzk5OTk5OSIvPgo8cGF0aCBkPSJNNiAyNmMwLTUuNSA0LjUtMTAgMTAtMTBzMTAgNC41IDEwIDEwIiBmaWxsPSIjOTk5OTk5Ii8+Cjwvc3ZnPg==';
 
-          liveStreamers.forEach(streamer => {
+          sortedLiveStreamers.forEach(streamer => {
             // 对于斗鱼和虎牙平台，添加缩略图显示
             let thumbnailHtml = '';
             if (streamer.thumbnail) {
@@ -216,8 +222,13 @@ class LiveAssistant {
               `;
             }
 
+            // 生成收藏按钮HTML
+            const isFavorite = this.isFavorite(streamer);
+            const favoriteIcon = isFavorite ? '★' : '☆';
+            const favoriteClass = isFavorite ? 'favorite-button favorited' : 'favorite-button not-favorited';
+
             html += `
-              <li class="streamer-item live" data-url="${streamer.url}">
+              <li class="streamer-item live" data-url="${streamer.url}" data-streamer-id="${streamer.id || streamer.name}">
                 ${thumbnailHtml}
                 <div class="streamer-content">
                   <div class="streamer-info">
@@ -227,9 +238,12 @@ class LiveAssistant {
                         <span class="streamer-name">${streamer.name}</span>
                         <span class="game-name">${streamer.gameName}</span>
                       </div>
-                      <div class="streamer-title">
-                        ${streamer.title || '直播中...'}
-                      </div>
+                        <div class="streamer-title-container">
+                          <span class="streamer-title">${streamer.title || '直播中...'}</span>
+                          <button class="${favoriteClass}" data-streamer-id="${streamer.id || streamer.name}">
+                            ${favoriteIcon}
+                          </button>
+                        </div>
                     </div>
                   </div>
                   <div class="streamer-stats">
@@ -266,6 +280,29 @@ class LiveAssistant {
         const url = item.dataset.url;
         if (url) {
           chrome.tabs.create({ url });
+        }
+      });
+    });
+
+    // 绑定收藏按钮点击事件
+    document.querySelectorAll('.favorite-button').forEach(button => {
+      button.addEventListener('click', (e) => {
+        e.stopPropagation(); // 防止事件冒泡
+        
+        // 获取父级streamer-item元素
+        const streamerItem = button.closest('.streamer-item');
+        if (streamerItem) {
+          // 从streamer-item中提取数据
+          const streamerId = streamerItem.dataset.streamerId;
+          const streamerName = button.dataset.streamerName || streamerId;
+          
+          // 创建streamer对象
+          const streamer = {
+            id: streamerId,
+            name: streamerName
+          };
+          
+          this.toggleFavorite(streamer);
         }
       });
     });
@@ -708,6 +745,66 @@ class LiveAssistant {
         messageContainer.style.display = 'none';
       }, 1000);
     }
+  }
+  
+  // 检查主播是否被收藏
+  isFavorite(streamer) {
+    // 使用主播唯一标识符进行判断
+    const streamerId = streamer.id || streamer.name;
+    return this.favoriteStreamers.has(streamerId);
+  }
+  
+  // 切换主播收藏状态
+  toggleFavorite(streamer) {
+    const streamerId = streamer.id || streamer.name;
+    
+    if (this.favoriteStreamers.has(streamerId)) {
+      // 取消收藏
+      this.favoriteStreamers.delete(streamerId);
+    } else {
+      // 添加收藏
+      this.favoriteStreamers.add(streamerId);
+    }
+    
+    // 保存到本地存储
+    this.saveFavorites();
+    
+    // 重新渲染页面
+    this.loadFollowedStreamers();
+  }
+  
+  // 保存收藏状态到本地存储
+  async saveFavorites() {
+    try {
+      await chrome.storage.local.set({ favoriteStreamers: Array.from(this.favoriteStreamers) });
+    } catch (error) {
+      console.error('保存收藏状态失败:', error);
+    }
+  }
+  
+  // 从本地存储加载收藏状态
+  async loadFavorites() {
+    try {
+      const result = await chrome.storage.local.get(['favoriteStreamers']);
+      if (result.favoriteStreamers) {
+        this.favoriteStreamers = new Set(result.favoriteStreamers);
+      }
+    } catch (error) {
+      console.error('加载收藏状态失败:', error);
+    }
+  }
+  
+  // 对主播列表进行排序，收藏的主播排在前面
+  sortFavoritesFirst(streamers) {
+    return streamers.slice().sort((a, b) => {
+      const aIsFavorite = this.isFavorite(a);
+      const bIsFavorite = this.isFavorite(b);
+      
+      // 收藏的主播排在前面
+      if (aIsFavorite && !bIsFavorite) return -1;
+      if (!aIsFavorite && bIsFavorite) return 1;
+      return 0;
+    });
   }
 }
 
