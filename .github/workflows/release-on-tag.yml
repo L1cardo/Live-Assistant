@@ -1,0 +1,40 @@
+name: Release on Tag
+
+on:
+  push:
+    tags:
+      - '*'
+  workflow_dispatch:
+
+jobs:
+  release:
+    name: Create Release
+    if: github.ref_type == 'tag'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: ⤵️ Check out code from GitHub
+        uses: actions/checkout@v5
+
+      - name: 📦 Package extension
+        run: |
+          zip -r live-assistant.zip src/ icon.png manifest.json
+
+      - name: Get Previous tag
+        id: previoustag
+        uses: WyriHaximus/github-action-get-previous-tag@v1
+
+      - name: 📝 Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
+          body: |
+            ${{ github.event.head_commit.message }}
+
+            **Full Changelog**: https://github.com/L1cardo/Live-Assistant/compare/${{ steps.previoustag.outputs.tag }}...${{ github.ref_name }}
+          draft: false
+          prerelease: false
+          files: live-assistant.zip
