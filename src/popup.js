@@ -61,6 +61,10 @@ class LiveAssistant {
     document.getElementById('applySettingsBtn').addEventListener('click', () => {
       this.applySettings();
     });
+    
+    document.getElementById('resetSettingsBtn').addEventListener('click', () => {
+      this.resetSettings();
+    });
   }
 
   async loadFollowedStreamers(isBackgroundUpdate = false) {
@@ -809,6 +813,38 @@ class LiveAssistant {
       if (aIsFavorite && !bIsFavorite) return -1;
       if (!aIsFavorite && bIsFavorite) return 1;
       return 0;
+    });
+  }
+  
+  // 重置所有设置
+  resetSettings() {
+    if (!confirm('确定要重置所有设置吗？此操作不可撤销。')) {
+      return;
+    }
+    
+    // 重置为默认值
+    this.platformOrder = Object.keys(this.platforms);
+    this.enabledPlatforms = Object.keys(this.platforms);
+    this.floatingButtonsVisible = true;
+    this.favoriteStreamers = new Set();
+    
+    // 从本地存储中删除所有设置数据
+    chrome.storage.local.remove([
+      'platformOrder', 
+      'enabledPlatforms', 
+      'floatingButtonsVisible', 
+      'favoriteStreamers',
+      'cachedStreamers',
+      'cachedTimestamp'
+    ], () => {
+      // 重新加载数据以应用重置后的设置
+      this.loadFollowedStreamers();
+      
+      // 重新渲染设置面板
+      this.renderSettings();
+      
+      // 显示提示信息
+      this.showMessage('所有设置已重置为默认值！');
     });
   }
 }
