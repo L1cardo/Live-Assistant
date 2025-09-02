@@ -354,8 +354,13 @@ class LiveAssistant {
     const buttonsContainer = document.createElement('div');
     buttonsContainer.className = 'floating-buttons';
     
-    // 为每个启用的平台创建按钮
-    this.enabledPlatforms.forEach(platformKey => {
+    // 按照用户自定义的平台顺序创建按钮
+    this.platformOrder.forEach(platformKey => {
+      // 检查该平台是否被启用
+      if (!this.enabledPlatforms.includes(platformKey)) {
+        return; // 跳过未启用的平台
+      }
+      
       const platformInfo = this.platforms[platformKey];
       // 安全检查：确保 platformInfo 存在且包含 icon 属性
       if (!platformInfo || !platformInfo.icon) {
