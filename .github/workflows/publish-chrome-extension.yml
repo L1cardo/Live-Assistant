@@ -1,0 +1,27 @@
+name: Publish Chrome Extension
+
+on:
+  push:
+    tags:
+      - '*'
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Publish webextension
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v5
+    - name: Package extension
+      run: |
+        zip -r live-assistant.zip src/ icon.png manifest.json
+    - name: Upload & release
+      uses: mnao305/chrome-extension-upload@v5.0.0
+      with:
+        file-path: live-assistant.zip
+        extension-id: gapakkgfjmmbdgaabgedecdhnpheboln
+        client-id: ${{ secrets.CHROME_CLIENT_ID }}
+        client-secret: ${{ secrets.CHROME_CLIENT_SECRET }}
+        refresh-token: ${{ secrets.CHROME_REFRESH_TOKEN }}
+        glob: false

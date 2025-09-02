@@ -1,0 +1,25 @@
+name: Publish Edge Add-on
+
+on:
+  push:
+    tags:
+      - '*'
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Publish webextension
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v5
+    - name: Package extension
+      run: |
+        zip -r live-assistant.zip src/ icon.png manifest.json
+    - name: Upload & release
+      uses: wdzeng/edge-addon@v2
+      with:
+        zip-path: live-assistant.zip
+        product-id: f6564570-5a99-4a18-bbd6-5ea8b175aca9
+        api-key: ${{ secrets.EDGE_API_KEY }}
+        client-id: ${{ secrets.EDGE_CLIENT_ID }}
