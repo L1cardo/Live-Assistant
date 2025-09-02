@@ -499,12 +499,12 @@
     /* 悬浮按钮样式 */
     .floating-buttons {
       position: fixed;
-      bottom: 4px;
-      right: 2px;
+      bottom: 8px;
+      right: 8px;
       display: flex;
       flex-direction: column;
       gap: 8px;
-      z-index: 1000;
+      z-index: 99999;
     }
     
     .floating-button {
@@ -610,9 +610,62 @@
       object-fit: contain;
     }
     
+    /* 折叠按钮 */
+    .collapse-button {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #4285f4;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      transition: all 0.2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .collapse-button:hover {
+      background: #3367d6;
+      transform: scale(1.1);
+    }
+    
+    .collapse-button::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      border-radius: 50%;
+      box-shadow: 0 0 0 2px rgba(255,255,255,0.3);
+    }
+    
+    .collapse-button-icon {
+      width: 20px;
+      height: 20px;
+      object-fit: contain;
+    }
+    
     /* 悬浮按钮容器 */
     .floating-buttons-container {
       position: relative;
+    }
+    
+    /* 折叠状态样式 */
+    .floating-buttons.collapsed {
+      /* 当处于折叠状态时，只显示折叠按钮 */
+    }
+    
+    .floating-buttons.collapsed .floating-button,
+    .floating-buttons.collapsed .top-button {
+      display: none !important;
+    }
+    
+    .floating-buttons.collapsed .collapse-button {
+      display: flex !important;
     }
     
     /* 设置区域样式 */
@@ -789,7 +842,7 @@
       background: #4285f4;
       color: white;
       border-radius: 6px;
-      z-index: 1000;
+      z-index: 99999;
       box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
     

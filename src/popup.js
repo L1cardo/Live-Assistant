@@ -31,6 +31,7 @@ class LiveAssistant {
     this.platformOrder = Object.keys(this.platforms);
     this.enabledPlatforms = Object.keys(this.platforms); // 默认所有平台都启用
     this.floatingButtonsVisible = true; // 默认悬浮按钮可见
+    this.floatingButtonsCollapsed = false; // 默认悬浮按钮不折叠
     this.favoriteStreamers = new Set(); // 收藏的主播集合
     this.init();
   }
@@ -138,7 +139,7 @@ class LiveAssistant {
   // 从本地存储加载缓存数据
   async loadCachedData() {
     try {
-      const result = await chrome.storage.local.get(['cachedStreamers', 'cachedTimestamp', 'platformOrder', 'enabledPlatforms', 'floatingButtonsVisible']);
+      const result = await chrome.storage.local.get(['cachedStreamers', 'cachedTimestamp', 'platformOrder', 'enabledPlatforms', 'floatingButtonsVisible', 'floatingButtonsCollapsed']);
       if (result.cachedStreamers) {
         // 如果有自定义平台顺序，则使用它
         if (result.platformOrder) {
@@ -151,6 +152,10 @@ class LiveAssistant {
         // 如果有悬浮按钮显示设置，则使用它
         if (result.floatingButtonsVisible !== undefined) {
           this.floatingButtonsVisible = result.floatingButtonsVisible;
+        }
+        // 如果有悬浮按钮折叠状态设置，则使用它
+        if (result.floatingButtonsCollapsed !== undefined) {
+          this.floatingButtonsCollapsed = result.floatingButtonsCollapsed;
         }
         // 显示缓存数据
         this.renderStreamers(result.cachedStreamers);
@@ -421,6 +426,32 @@ class LiveAssistant {
     topButton.appendChild(topIcon);
     buttonsContainer.appendChild(topButton);
     
+    // 添加折叠按钮
+    const collapseButton = document.createElement('button');
+    collapseButton.className = 'collapse-button';
+    collapseButton.title = this.floatingButtonsCollapsed ? '展开悬浮按钮' : '折叠悬浮按钮';
+    
+    // 创建折叠按钮图标
+    const collapseIcon = document.createElement('img');
+    collapseIcon.className = 'collapse-button-icon';
+    // 根据保存的状态设置初始图标
+    if (this.floatingButtonsCollapsed) {
+      // 折叠状态 - 显示上箭头
+      collapseIcon.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M7 14l5-5 5 5z"/></svg>';
+    } else {
+      // 展开状态 - 显示下箭头
+      collapseIcon.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M7 10l5 5 5-5z"/></svg>';
+    }
+    collapseIcon.alt = '折叠按钮';
+    
+    // 添加折叠按钮点击事件
+    collapseButton.addEventListener('click', () => {
+      this.toggleFloatingButtons();
+    });
+    
+    collapseButton.appendChild(collapseIcon);
+    buttonsContainer.appendChild(collapseButton);
+    
     container.appendChild(buttonsContainer);
     document.body.appendChild(container);
     
@@ -428,6 +459,20 @@ class LiveAssistant {
     const floatingButtonsContainer = document.querySelector('.floating-buttons-container');
     if (floatingButtonsContainer) {
       floatingButtonsContainer.style.display = this.floatingButtonsVisible ? 'block' : 'none';
+    }
+    
+    // 根据折叠状态设置按钮显示
+    if (this.floatingButtonsCollapsed) {
+      buttonsContainer.classList.add('collapsed');
+      // 隐藏所有按钮，只显示折叠按钮
+      const allButtons = buttonsContainer.querySelectorAll('.floating-button, .top-button');
+      allButtons.forEach(button => {
+        button.style.display = 'none';
+      });
+      // 显示折叠按钮
+      collapseButton.style.display = 'flex';
+    } else {
+      buttonsContainer.classList.remove('collapsed');
     }
   }
   
@@ -816,6 +861,61 @@ class LiveAssistant {
     });
   }
   
+  // 切换悬浮按钮折叠状态
+  toggleFloatingButtons() {
+    const buttonsContainer = document.querySelector('.floating-buttons');
+    const collapseButton = document.querySelector('.collapse-button');
+    const allButtons = buttonsContainer.querySelectorAll('.floating-button, .top-button');
+    
+    if (!buttonsContainer || !collapseButton) return;
+    
+    // 获取当前折叠状态（通过检查是否有collapsed类）
+    const isCollapsed = buttonsContainer.classList.contains('collapsed');
+    
+    if (isCollapsed) {
+      // 展开状态
+      buttonsContainer.classList.remove('collapsed');
+      collapseButton.title = '折叠悬浮按钮';
+      
+      // 更新图标为下箭头（展开状态）
+      const collapseIcon = collapseButton.querySelector('.collapse-button-icon');
+      if (collapseIcon) {
+        collapseIcon.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M7 10l5 5 5-5z"/></svg>';
+      }
+      
+      // 显示所有按钮
+      allButtons.forEach(button => {
+        button.style.display = 'flex';
+      });
+      
+      // 保存状态到本地存储
+      this.floatingButtonsCollapsed = false;
+      chrome.storage.local.set({ floatingButtonsCollapsed: false });
+    } else {
+      // 折叠状态
+      buttonsContainer.classList.add('collapsed');
+      collapseButton.title = '展开悬浮按钮';
+      
+      // 更新图标为上箭头（折叠状态）
+      const collapseIcon = collapseButton.querySelector('.collapse-button-icon');
+      if (collapseIcon) {
+        collapseIcon.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M7 14l5-5 5 5z"/></svg>';
+      }
+      
+      // 只显示折叠按钮，隐藏其他按钮
+      allButtons.forEach(button => {
+        button.style.display = 'none';
+      });
+      
+      // 显示折叠按钮
+      collapseButton.style.display = 'flex';
+      
+      // 保存状态到本地存储
+      this.floatingButtonsCollapsed = true;
+      chrome.storage.local.set({ floatingButtonsCollapsed: true });
+    }
+  }
+  
   // 重置所有设置
   resetSettings() {
     if (!confirm('确定要重置所有设置吗？此操作不可撤销。')) {
@@ -826,6 +926,7 @@ class LiveAssistant {
     this.platformOrder = Object.keys(this.platforms);
     this.enabledPlatforms = Object.keys(this.platforms);
     this.floatingButtonsVisible = true;
+    this.floatingButtonsCollapsed = false; // 重置折叠状态
     this.favoriteStreamers = new Set();
     
     // 从本地存储中删除所有设置数据
@@ -833,6 +934,7 @@ class LiveAssistant {
       'platformOrder', 
       'enabledPlatforms', 
       'floatingButtonsVisible', 
+      'floatingButtonsCollapsed', // 添加这个字段
       'favoriteStreamers',
       'cachedStreamers',
       'cachedTimestamp'
