@@ -510,7 +510,7 @@ class TwitchAPI {
 
     // 提取所有关注的流数据
     const followedStreams = [];
-    
+
     const sections = result.data.sideNav.sections.edges;
     sections.forEach((section) => {
       if (section.node.content.edges && section.node.id.includes("followed")) {
@@ -536,7 +536,7 @@ class TwitchAPI {
         thumbnail: `https://static-cdn.jtvnw.net/previews-ttv/live_user_${node.broadcaster.login}-320x180.jpg`,
         gameName: node.game.displayName || '',
       }
-      
+
       return streamer;
     });
   }

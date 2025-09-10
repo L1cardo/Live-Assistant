@@ -50,19 +50,19 @@ class LiveAssistant {
     document.getElementById('refreshBtn').addEventListener('click', (event) => {
       // 显示加载动画并执行后台刷新
       this.showRefreshLoading();
-      
+
       // 立即执行后台刷新
       this.refreshInBackground();
     });
-    
+
     document.getElementById('settingsBtn').addEventListener('click', () => {
       this.toggleSettings();
     });
-    
+
     document.getElementById('applySettingsBtn').addEventListener('click', () => {
       this.applySettings();
     });
-    
+
     document.getElementById('resetSettingsBtn').addEventListener('click', () => {
       this.resetSettings();
     });
@@ -70,16 +70,16 @@ class LiveAssistant {
 
   async loadFollowedStreamers(isBackgroundUpdate = false) {
     const content = document.getElementById('content');
-    
+
     try {
       console.log('开始获取关注列表...');
       // 获取所有平台数据
       const followedData = await this.getFollowedStreamers();
       console.log('获取到的数据:', followedData);
-      
+
       // 缓存数据
       await this.cacheData(followedData);
-      
+
       this.renderStreamers(followedData);
     } catch (error) {
       console.error('加载失败:', error);
@@ -178,16 +178,16 @@ class LiveAssistant {
       if (!this.enabledPlatforms.includes(platformKey)) {
         return; // 跳过未启用的平台
       }
-      
+
       const platformInfo = this.platforms[platformKey];
       // 安全检查：确保 platformInfo 存在
       if (!platformInfo) {
         console.warn(`跳过无效的平台配置: ${platformKey}`, platformInfo);
         return;
       }
-      
+
       const platformData = followedData[platformKey];
-      
+
       // 计算正在直播的主播数量
       const liveStreamers = platformData?.data ? platformData.data.filter(streamer => streamer.isLive) : [];
 
@@ -197,8 +197,10 @@ class LiveAssistant {
       html += `
         <div class="platform-section" id="platform-${platformKey}">
           <div class="platform-title">
-            <img class="platform-icon" src="${platformInfo.icon}" alt="${platformInfo.name}">
-            <span class="platform-name">${platformInfo.name}</span>
+            <div class="platform-header" data-url="https://www.${platformKey}.com">
+              <img class="platform-icon" src="${platformInfo.icon}" alt="${platformInfo.name}">
+              <span class="platform-name">${platformInfo.name}</span>
+            </div>
             <span class="live-count">${liveStreamers.length} 位主播正在直播</span>
           </div>
       `;
@@ -297,20 +299,20 @@ class LiveAssistant {
     document.querySelectorAll('.favorite-button').forEach(button => {
       button.addEventListener('click', (e) => {
         e.stopPropagation(); // 防止事件冒泡
-        
+
         // 获取父级streamer-item元素
         const streamerItem = button.closest('.streamer-item');
         if (streamerItem) {
           // 从streamer-item中提取数据
           const streamerId = streamerItem.dataset.streamerId;
           const streamerName = button.dataset.streamerName || streamerId;
-          
+
           // 创建streamer对象
           const streamer = {
             id: streamerId,
             name: streamerName
           };
-          
+
           this.toggleFavorite(streamer);
         }
       });
@@ -345,8 +347,18 @@ class LiveAssistant {
         img.style.display = 'none';
       });
     });
+
+    // 绑定平台标题点击事件
+    document.querySelectorAll('.platform-header').forEach(header => {
+      header.addEventListener('click', () => {
+        const url = header.dataset.url;
+        if (url) {
+          chrome.tabs.create({ url });
+        }
+      });
+    });
   }
-  
+
   // 创建悬浮按钮
   createFloatingButtons() {
     // 移除已存在的浮动按钮容器
@@ -358,30 +370,30 @@ class LiveAssistant {
     // 创建浮动按钮容器
     const container = document.createElement('div');
     container.className = 'floating-buttons-container';
-    
+
     // 创建浮动按钮容器
     const buttonsContainer = document.createElement('div');
     buttonsContainer.className = 'floating-buttons';
-    
+
     // 按照用户自定义的平台顺序创建按钮
     this.platformOrder.forEach(platformKey => {
       // 检查该平台是否被启用
       if (!this.enabledPlatforms.includes(platformKey)) {
         return; // 跳过未启用的平台
       }
-      
+
       const platformInfo = this.platforms[platformKey];
       // 安全检查：确保 platformInfo 存在且包含 icon 属性
       if (!platformInfo || !platformInfo.icon) {
         console.warn(`跳过无效的平台配置: ${platformKey}`, platformInfo);
         return;
       }
-      
+
       const button = document.createElement('button');
       button.className = 'floating-button';
       button.title = platformInfo.name;
       button.dataset.platform = platformKey;
-      
+
       // 创建图标
       const icon = document.createElement('img');
       icon.className = 'floating-button-icon';
@@ -391,46 +403,46 @@ class LiveAssistant {
       }
       icon.src = platformInfo.icon;
       icon.alt = platformInfo.name;
-      
+
       // 创建标签
       const label = document.createElement('span');
       label.className = 'floating-button-label';
       label.textContent = platformInfo.name;
-      
+
       // 添加点击事件
       button.addEventListener('click', () => {
         this.scrollToPlatform(platformKey);
       });
-      
+
       button.appendChild(icon);
       button.appendChild(label);
       buttonsContainer.appendChild(button);
     });
-    
+
     // 添加返回顶部按钮
     const topButton = document.createElement('button');
     topButton.className = 'top-button';
     topButton.title = '返回顶部';
-    
+
     // 创建返回顶部图标
     const topIcon = document.createElement('img');
     topIcon.className = 'top-button-icon';
     topIcon.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M7 14l5-5 5 5z"/></svg>';
     topIcon.alt = '返回顶部';
-    
+
     // 添加返回顶部点击事件
     topButton.addEventListener('click', () => {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
-    
+
     topButton.appendChild(topIcon);
     buttonsContainer.appendChild(topButton);
-    
+
     // 添加折叠按钮
     const collapseButton = document.createElement('button');
     collapseButton.className = 'collapse-button';
     collapseButton.title = this.floatingButtonsCollapsed ? '展开悬浮按钮' : '折叠悬浮按钮';
-    
+
     // 创建折叠按钮图标
     const collapseIcon = document.createElement('img');
     collapseIcon.className = 'collapse-button-icon';
@@ -443,24 +455,24 @@ class LiveAssistant {
       collapseIcon.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M7 10l5 5 5-5z"/></svg>';
     }
     collapseIcon.alt = '折叠按钮';
-    
+
     // 添加折叠按钮点击事件
     collapseButton.addEventListener('click', () => {
       this.toggleFloatingButtons();
     });
-    
+
     collapseButton.appendChild(collapseIcon);
     buttonsContainer.appendChild(collapseButton);
-    
+
     container.appendChild(buttonsContainer);
     document.body.appendChild(container);
-    
+
     // 根据设置决定是否显示悬浮按钮
     const floatingButtonsContainer = document.querySelector('.floating-buttons-container');
     if (floatingButtonsContainer) {
       floatingButtonsContainer.style.display = this.floatingButtonsVisible ? 'block' : 'none';
     }
-    
+
     // 根据折叠状态设置按钮显示
     if (this.floatingButtonsCollapsed) {
       buttonsContainer.classList.add('collapsed');
@@ -475,7 +487,7 @@ class LiveAssistant {
       buttonsContainer.classList.remove('collapsed');
     }
   }
-  
+
   // 滚动到指定平台
   scrollToPlatform(platformKey) {
     const platformElement = document.getElementById(`platform-${platformKey}`);
@@ -483,7 +495,7 @@ class LiveAssistant {
       platformElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   }
-  
+
   // 格式化数字显示
   formatNumber(num) {
     if (!num) return '0';
@@ -495,9 +507,9 @@ class LiveAssistant {
     }
     return num.toString();
   }
-  
+
   // 获取观看数据统计
-  getViewerStats(streamer) {    
+  getViewerStats(streamer) {
     if (streamer.platform === 'douyu' || streamer.platform === 'huya') {
       // 斗鱼和虎牙的viewers字段实际是热度，强制显示
       const heat = streamer.viewers;
@@ -512,18 +524,18 @@ class LiveAssistant {
       }
     }
   }
-  
+
   // 格式化时间显示（修复直播时间显示问题）
   formatTime(timeValue) {
     if (!timeValue) return '';
-    
+
     // 处理不同的时间格式
     if (typeof timeValue === 'number') {
       // 如果是数字，假设是秒数（如B站的liveTime）
       const seconds = timeValue;
       const hours = Math.floor(seconds / 3600);
       const minutes = Math.floor((seconds % 3600) / 60);
-      
+
       if (hours > 0) {
         return `${hours}小时${minutes}分钟`;
       } else if (minutes > 0) {
@@ -537,10 +549,10 @@ class LiveAssistant {
         const time = new Date(timeValue);
         const now = new Date();
         const diff = now - time;
-        
+
         const hours = Math.floor(diff / (1000 * 60 * 60));
         const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-        
+
         if (hours > 0) {
           return `${hours}小时${minutes}分钟`;
         } else if (minutes > 0) {
@@ -553,7 +565,7 @@ class LiveAssistant {
       }
     }
   }
-  
+
   // 切换设置面板显示
   toggleSettings() {
     const settingsPanel = document.getElementById('settingsPanel');
@@ -561,7 +573,7 @@ class LiveAssistant {
     const contentDiv = document.getElementById('content');
     const refreshBtn = document.getElementById('refreshBtn');
     const floatingButtonsContainer = document.querySelector('.floating-buttons-container');
-    
+
     // 切换显示状态
     if (settingsPanel.style.display === 'none' || settingsPanel.style.display === '') {
       // 显示设置面板
@@ -587,12 +599,12 @@ class LiveAssistant {
       }
     }
   }
-  
+
   // 渲染设置面板中的平台列表
   renderSettings() {
     const sortable = document.getElementById('platformSortable');
     sortable.innerHTML = '';
-    
+
     // 按当前顺序渲染平台项
     this.platformOrder.forEach(platformKey => {
       // 安全检查：确保平台配置存在且不为null
@@ -600,7 +612,7 @@ class LiveAssistant {
         console.warn(`跳过无效的平台配置: ${platformKey}`, this.platforms[platformKey]);
         return;
       }
-      
+
       const platform = this.platforms[platformKey];
       const item = document.createElement('li');
       item.className = 'platform-item';
@@ -617,13 +629,13 @@ class LiveAssistant {
       `;
       sortable.appendChild(item);
     });
-    
+
     // 添加拖拽事件监听器
     this.setupDragAndDrop();
-    
+
     // 为开关添加事件监听器
     this.setupSwitchListeners();
-    
+
     // 初始化悬浮按钮开关状态
     // 延迟执行，确保DOM已经更新
     setTimeout(() => {
@@ -633,7 +645,7 @@ class LiveAssistant {
       }
     }, 0);
   }
-  
+
   // 为平台开关添加事件监听器
   setupSwitchListeners() {
     const switchInputs = document.querySelectorAll('.platform-switch input');
@@ -641,10 +653,10 @@ class LiveAssistant {
       input.addEventListener('change', (e) => {
         const platformItem = e.target.closest('.platform-item');
         if (!platformItem) return; // 安全检查
-        
+
         const platformKey = platformItem.getAttribute('data-platform');
         const isChecked = e.target.checked;
-        
+
         if (isChecked) {
           // 添加到启用列表
           if (!this.enabledPlatforms.includes(platformKey)) {
@@ -657,7 +669,7 @@ class LiveAssistant {
       });
     });
   }
-  
+
   // 设置拖拽功能
   setupDragAndDrop() {
     const sortable = document.getElementById('platformSortable');
@@ -682,7 +694,7 @@ class LiveAssistant {
       e.preventDefault();
       const afterElement = this.getDragAfterElement(sortable, e.clientY);
       const draggable = document.querySelector('.dragging');
-      
+
       if (afterElement == null) {
         sortable.appendChild(draggable);
       } else {
@@ -694,7 +706,7 @@ class LiveAssistant {
       e.preventDefault();
     });
   }
-  
+
   // 获取拖拽位置
   getDragAfterElement(container, y) {
     const draggableElements = [...container.querySelectorAll('.platform-item:not(.dragging)')];
@@ -710,54 +722,54 @@ class LiveAssistant {
       }
     }, { offset: Number.NEGATIVE_INFINITY }).element;
   }
-  
+
   // 应用设置
   applySettings() {
     const platformItems = document.querySelectorAll('.platform-item');
-    const newOrder = Array.from(platformItems).map(item => 
+    const newOrder = Array.from(platformItems).map(item =>
       item.getAttribute('data-platform')
     );
-    
+
     // 更新平台顺序
     this.platformOrder = newOrder;
-    
+
     // 过滤掉无效的平台ID，确保只保留有效的平台
-    this.enabledPlatforms = this.enabledPlatforms.filter(platformKey => 
+    this.enabledPlatforms = this.enabledPlatforms.filter(platformKey =>
       this.platforms[platformKey] !== undefined
     );
-    
+
     // 获取悬浮按钮开关状态
     const floatingButtonToggle = document.getElementById('floatingButtonToggle');
     if (floatingButtonToggle) {
       this.floatingButtonsVisible = floatingButtonToggle.checked;
     }
-    
+
     // 保存到本地存储
-    chrome.storage.local.set({ 
+    chrome.storage.local.set({
       platformOrder: newOrder,
       enabledPlatforms: this.enabledPlatforms,
       floatingButtonsVisible: this.floatingButtonsVisible
     });
-    
+
     // 重新渲染主界面
     this.loadFollowedStreamers();
-    
+
     // 显示页面内提示信息
     this.showMessage('设置已保存！');
   }
-  
+
   // 在后台刷新数据
   async refreshInBackground() {
     try {
       // 获取最新数据
       const followedData = await this.getFollowedStreamers();
-      
+
       // 缓存新数据
       await this.cacheData(followedData);
-      
+
       // 更新UI显示（即使是在后台刷新，也要更新显示）
       this.renderStreamers(followedData);
-      
+
       console.log('后台刷新完成');
     } catch (error) {
       console.error('后台刷新失败:', error);
@@ -793,25 +805,25 @@ class LiveAssistant {
     if (messageContainer) {
       messageContainer.textContent = message;
       messageContainer.style.display = 'block';
-      
+
       // 3秒后自动隐藏
       setTimeout(() => {
         messageContainer.style.display = 'none';
       }, 1000);
     }
   }
-  
+
   // 检查主播是否被收藏
   isFavorite(streamer) {
     // 使用主播唯一标识符进行判断
     const streamerId = streamer.id || streamer.name;
     return this.favoriteStreamers.has(streamerId);
   }
-  
+
   // 切换主播收藏状态
   toggleFavorite(streamer) {
     const streamerId = streamer.id || streamer.name;
-    
+
     if (this.favoriteStreamers.has(streamerId)) {
       // 取消收藏
       this.favoriteStreamers.delete(streamerId);
@@ -819,14 +831,14 @@ class LiveAssistant {
       // 添加收藏
       this.favoriteStreamers.add(streamerId);
     }
-    
+
     // 保存到本地存储
     this.saveFavorites();
-    
+
     // 重新渲染页面
     this.loadFollowedStreamers();
   }
-  
+
   // 保存收藏状态到本地存储
   async saveFavorites() {
     try {
@@ -835,7 +847,7 @@ class LiveAssistant {
       console.error('保存收藏状态失败:', error);
     }
   }
-  
+
   // 从本地存储加载收藏状态
   async loadFavorites() {
     try {
@@ -847,47 +859,47 @@ class LiveAssistant {
       console.error('加载收藏状态失败:', error);
     }
   }
-  
+
   // 对主播列表进行排序，收藏的主播排在前面
   sortFavoritesFirst(streamers) {
     return streamers.slice().sort((a, b) => {
       const aIsFavorite = this.isFavorite(a);
       const bIsFavorite = this.isFavorite(b);
-      
+
       // 收藏的主播排在前面
       if (aIsFavorite && !bIsFavorite) return -1;
       if (!aIsFavorite && bIsFavorite) return 1;
       return 0;
     });
   }
-  
+
   // 切换悬浮按钮折叠状态
   toggleFloatingButtons() {
     const buttonsContainer = document.querySelector('.floating-buttons');
     const collapseButton = document.querySelector('.collapse-button');
     const allButtons = buttonsContainer.querySelectorAll('.floating-button, .top-button');
-    
+
     if (!buttonsContainer || !collapseButton) return;
-    
+
     // 获取当前折叠状态（通过检查是否有collapsed类）
     const isCollapsed = buttonsContainer.classList.contains('collapsed');
-    
+
     if (isCollapsed) {
       // 展开状态
       buttonsContainer.classList.remove('collapsed');
       collapseButton.title = '折叠悬浮按钮';
-      
+
       // 更新图标为下箭头（展开状态）
       const collapseIcon = collapseButton.querySelector('.collapse-button-icon');
       if (collapseIcon) {
         collapseIcon.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M7 10l5 5 5-5z"/></svg>';
       }
-      
+
       // 显示所有按钮
       allButtons.forEach(button => {
         button.style.display = 'flex';
       });
-      
+
       // 保存状态到本地存储
       this.floatingButtonsCollapsed = false;
       chrome.storage.local.set({ floatingButtonsCollapsed: false });
@@ -895,45 +907,45 @@ class LiveAssistant {
       // 折叠状态
       buttonsContainer.classList.add('collapsed');
       collapseButton.title = '展开悬浮按钮';
-      
+
       // 更新图标为上箭头（折叠状态）
       const collapseIcon = collapseButton.querySelector('.collapse-button-icon');
       if (collapseIcon) {
         collapseIcon.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M7 14l5-5 5 5z"/></svg>';
       }
-      
+
       // 只显示折叠按钮，隐藏其他按钮
       allButtons.forEach(button => {
         button.style.display = 'none';
       });
-      
+
       // 显示折叠按钮
       collapseButton.style.display = 'flex';
-      
+
       // 保存状态到本地存储
       this.floatingButtonsCollapsed = true;
       chrome.storage.local.set({ floatingButtonsCollapsed: true });
     }
   }
-  
+
   // 重置所有设置
   resetSettings() {
     if (!confirm('确定要重置所有设置吗？此操作不可撤销。')) {
       return;
     }
-    
+
     // 重置为默认值
     this.platformOrder = Object.keys(this.platforms);
     this.enabledPlatforms = Object.keys(this.platforms);
     this.floatingButtonsVisible = true;
     this.floatingButtonsCollapsed = false; // 重置折叠状态
     this.favoriteStreamers = new Set();
-    
+
     // 从本地存储中删除所有设置数据
     chrome.storage.local.remove([
-      'platformOrder', 
-      'enabledPlatforms', 
-      'floatingButtonsVisible', 
+      'platformOrder',
+      'enabledPlatforms',
+      'floatingButtonsVisible',
       'floatingButtonsCollapsed', // 添加这个字段
       'favoriteStreamers',
       'cachedStreamers',
@@ -941,10 +953,10 @@ class LiveAssistant {
     ], () => {
       // 重新加载数据以应用重置后的设置
       this.loadFollowedStreamers();
-      
+
       // 重新渲染设置面板
       this.renderSettings();
-      
+
       // 显示提示信息
       this.showMessage('所有设置已重置为默认值！');
     });
