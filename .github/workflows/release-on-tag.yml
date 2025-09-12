@@ -1,10 +1,15 @@
 name: Release on Tag
 
 on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag (e.g. v1.0.0)'
+        required: true
+        default: 'v1.0.0'
   push:
     tags:
-      - '*'
-  workflow_dispatch:
+      - v*.*.*
 
 jobs:
   release:
@@ -22,19 +27,28 @@ jobs:
         run: |
           zip -r live-assistant.zip src/ icon.png manifest.json
 
-      - name: Get Previous tag
-        id: previoustag
-        uses: WyriHaximus/github-action-get-previous-tag@v1
+      - name: Get tag
+        id: get-tag
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            current_tag="${{ github.event.inputs.tag }}"
+          else
+            current_tag="${GITHUB_REF#refs/tags/}"
+          fi
+          previous_tag=$(git tag --sort=-v:refname | grep -v "^$current_tag$" | head -n 1)
+          echo "current_tag=$current_tag" >> $GITHUB_OUTPUT
+          echo "previous_tag=$previous_tag" >> $GITHUB_OUTPUT
 
       - name: 📝 Create Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.ref_name }}
-          name: ${{ github.ref_name }}
+          tag_name: ${{ steps.get-tag.outputs.current_tag }}
+          name: ${{ steps.get-tag.outputs.current_tag }}
           body: |
             ${{ github.event.head_commit.message }}
 
-            **Full Changelog**: https://github.com/L1cardo/Live-Assistant/compare/${{ steps.previoustag.outputs.tag }}...${{ github.ref_name }}
+            **Full Changelog**: https://github.com/L1cardo/Live-Assistant/compare/${{ steps.get-tag.outputs.previous_tag }}...${{ steps.get-tag.outputs.current_tag }}
           draft: false
           prerelease: false
           files: live-assistant.zip
