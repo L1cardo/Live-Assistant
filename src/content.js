@@ -8,11 +8,11 @@ class ContentExtractor {
   detectPlatform() {
     const hostname = window.location.hostname;
 
-    if (hostname.includes('douyu.com')) return 'douyu';
-    if (hostname.includes('huya.com')) return 'huya';
-    if (hostname.includes('bilibili.com')) return 'bilibili';
-    if (hostname.includes('douyin.com')) return 'douyin';
-    if (hostname.includes('twitch.tv')) return 'twitch';
+    if (hostname.includes("douyu.com")) return "douyu";
+    if (hostname.includes("huya.com")) return "huya";
+    if (hostname.includes("bilibili.com")) return "bilibili";
+    if (hostname.includes("douyin.com")) return "douyin";
+    if (hostname.includes("twitch.tv")) return "twitch";
 
     return null;
   }
@@ -22,10 +22,10 @@ class ContentExtractor {
 
     // 监听来自background的消息
     chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-      if (request.action === 'extractFollowData') {
+      if (request.action === "extractFollowData") {
         this.extractFollowData()
-          .then(data => sendResponse({ success: true, data }))
-          .catch(error => sendResponse({ success: false, error: error.message }));
+          .then((data) => sendResponse({ success: true, data }))
+          .catch((error) => sendResponse({ success: false, error: error.message }));
         return true;
       }
     });
@@ -33,15 +33,15 @@ class ContentExtractor {
 
   async extractFollowData() {
     switch (this.platform) {
-      case 'douyu':
+      case "douyu":
         return this.extractDouyuData();
-      case 'huya':
+      case "huya":
         return this.extractHuyaData();
-      case 'bilibili':
+      case "bilibili":
         return this.extractBilibiliData();
-      case 'douyin':
+      case "douyin":
         return this.extractDouyinData();
-      case 'twitch':
+      case "twitch":
         return this.extractTwitchData();
       default:
         return [];
@@ -50,28 +50,28 @@ class ContentExtractor {
 
   extractDouyuData() {
     // 从斗鱼页面提取关注数据
-    const followItems = document.querySelectorAll('.follow-card, .room-card');
+    const followItems = document.querySelectorAll(".follow-card, .room-card");
     const streamers = [];
 
-    followItems.forEach(item => {
+    followItems.forEach((item) => {
       try {
-        const nameEl = item.querySelector('.room-name, .anchor-name');
-        const avatarEl = item.querySelector('.room-cover img, .anchor-avatar img');
-        const linkEl = item.querySelector('a');
-        const statusEl = item.querySelector('.room-status, .live-status');
+        const nameEl = item.querySelector(".room-name, .anchor-name");
+        const avatarEl = item.querySelector(".room-cover img, .anchor-avatar img");
+        const linkEl = item.querySelector("a");
+        const statusEl = item.querySelector(".room-status, .live-status");
 
         if (nameEl && avatarEl && linkEl) {
           streamers.push({
             name: nameEl.textContent.trim(),
             avatar: avatarEl.src,
             url: linkEl.href,
-            isLive: statusEl ? statusEl.textContent.includes('直播中') : false,
+            isLive: statusEl ? statusEl.textContent.includes("直播中") : false,
             title: nameEl.textContent.trim(),
-            platform: 'douyu'
+            platform: "douyu",
           });
         }
       } catch (error) {
-        console.error('解析斗鱼数据错误:', error);
+        console.error("解析斗鱼数据错误:", error);
       }
     });
 
@@ -80,28 +80,28 @@ class ContentExtractor {
 
   extractHuyaData() {
     // 从虎牙页面提取关注数据
-    const followItems = document.querySelectorAll('.follow-item, .room-item');
+    const followItems = document.querySelectorAll(".follow-item, .room-item");
     const streamers = [];
 
-    followItems.forEach(item => {
+    followItems.forEach((item) => {
       try {
-        const nameEl = item.querySelector('.room-name, .nick');
-        const avatarEl = item.querySelector('.room-pic img, .avatar img');
-        const linkEl = item.querySelector('a');
-        const statusEl = item.querySelector('.room-status');
+        const nameEl = item.querySelector(".room-name, .nick");
+        const avatarEl = item.querySelector(".room-pic img, .avatar img");
+        const linkEl = item.querySelector("a");
+        const statusEl = item.querySelector(".room-status");
 
         if (nameEl && avatarEl && linkEl) {
           streamers.push({
             name: nameEl.textContent.trim(),
             avatar: avatarEl.src,
             url: linkEl.href,
-            isLive: item.classList.contains('on') || statusEl?.textContent.includes('直播中'),
+            isLive: item.classList.contains("on") || statusEl?.textContent.includes("直播中"),
             title: nameEl.textContent.trim(),
-            platform: 'huya'
+            platform: "huya",
           });
         }
       } catch (error) {
-        console.error('解析虎牙数据错误:', error);
+        console.error("解析虎牙数据错误:", error);
       }
     });
 
@@ -110,28 +110,28 @@ class ContentExtractor {
 
   extractBilibiliData() {
     // 从B站页面提取关注数据
-    const followItems = document.querySelectorAll('.follow-card, .live-card');
+    const followItems = document.querySelectorAll(".follow-card, .live-card");
     const streamers = [];
 
-    followItems.forEach(item => {
+    followItems.forEach((item) => {
       try {
-        const nameEl = item.querySelector('.uname, .room-name');
-        const avatarEl = item.querySelector('.face img, .cover img');
-        const linkEl = item.querySelector('a');
-        const statusEl = item.querySelector('.live-status, .room-status');
+        const nameEl = item.querySelector(".uname, .room-name");
+        const avatarEl = item.querySelector(".face img, .cover img");
+        const linkEl = item.querySelector("a");
+        const statusEl = item.querySelector(".live-status, .room-status");
 
         if (nameEl && avatarEl && linkEl) {
           streamers.push({
             name: nameEl.textContent.trim(),
             avatar: avatarEl.src,
             url: linkEl.href,
-            isLive: statusEl ? statusEl.textContent.includes('直播中') : false,
+            isLive: statusEl ? statusEl.textContent.includes("直播中") : false,
             title: nameEl.textContent.trim(),
-            platform: 'bilibili'
+            platform: "bilibili",
           });
         }
       } catch (error) {
-        console.error('解析B站数据错误:', error);
+        console.error("解析B站数据错误:", error);
       }
     });
 
@@ -145,25 +145,16 @@ class ContentExtractor {
 
   extractTwitchData() {
     // 从Twitch页面提取关注数据
-    const followItems = document.querySelectorAll(
-      '.tw-follow-card, .side-nav-card, [data-test-selector="followed-channel"], ' +
-      '[data-a-target="side-nav-channel-link"], [data-a-target="followed-channel-item"]'
-    );
+    const followItems = document.querySelectorAll('.tw-follow-card, .side-nav-card, [data-test-selector="followed-channel"], ' + '[data-a-target="side-nav-channel-link"], [data-a-target="followed-channel-item"]');
     const streamers = [];
 
-    followItems.forEach(item => {
+    followItems.forEach((item) => {
       try {
         // 尝试多种选择器来获取主播信息
-        const nameEl = item.querySelector(
-          '.tw-title, .side-nav-title, [data-a-target="side-nav-title"], ' +
-          '[data-a-target="followed-channel-username"], [data-a-target="chat-line-username"]'
-        );
-        const avatarEl = item.querySelector('img');
-        const linkEl = item.querySelector('a');
-        const statusEl = item.querySelector(
-          '.tw-channel-status, .side-nav-live-indicator, [data-a-target="side-nav-live-indicator"], ' +
-          '.live-indicator, [data-a-target="live-indicator"]'
-        );
+        const nameEl = item.querySelector('.tw-title, .side-nav-title, [data-a-target="side-nav-title"], ' + '[data-a-target="followed-channel-username"], [data-a-target="chat-line-username"]');
+        const avatarEl = item.querySelector("img");
+        const linkEl = item.querySelector("a");
+        const statusEl = item.querySelector('.tw-channel-status, .side-nav-live-indicator, [data-a-target="side-nav-live-indicator"], ' + '.live-indicator, [data-a-target="live-indicator"]');
 
         if (nameEl && avatarEl) {
           // 获取主播名称
@@ -171,13 +162,13 @@ class ContentExtractor {
 
           // 获取头像URL
           let avatar = avatarEl.src;
-          if (avatar && avatar.includes('profile_image')) {
+          if (avatar && avatar.includes("profile_image")) {
             // 确保使用合适的头像尺寸
-            avatar = avatar.replace(/-[0-9]+x[0-9]+/, '-70x70');
+            avatar = avatar.replace(/-[0-9]+x[0-9]+/, "-70x70");
           }
 
           // 构建主播URL
-          let url = '';
+          let url = "";
           if (linkEl && linkEl.href) {
             url = linkEl.href;
           } else if (name) {
@@ -186,12 +177,7 @@ class ContentExtractor {
           }
 
           // 检查是否正在直播
-          const isLive = statusEl ?
-            (statusEl.textContent.includes('直播中') ||
-              statusEl.textContent.includes('LIVE') ||
-              statusEl.classList.contains('live') ||
-              statusEl.getAttribute('data-a-target') === 'side-nav-live-indicator') :
-            false;
+          const isLive = statusEl ? statusEl.textContent.includes("直播中") || statusEl.textContent.includes("LIVE") || statusEl.classList.contains("live") || statusEl.getAttribute("data-a-target") === "side-nav-live-indicator" : false;
 
           streamers.push({
             name: name,
@@ -199,32 +185,32 @@ class ContentExtractor {
             url: url,
             isLive: isLive,
             title: name,
-            platform: 'twitch'
+            platform: "twitch",
           });
         }
       } catch (error) {
-        console.error('解析Twitch数据错误:', error);
+        console.error("解析Twitch数据错误:", error);
       }
     });
 
     // 如果没有找到标准的关注卡片，尝试从侧边栏获取
     if (streamers.length === 0) {
       const sidebarItems = document.querySelectorAll('[data-a-target="side-nav-channel-link"]');
-      sidebarItems.forEach(item => {
+      sidebarItems.forEach((item) => {
         try {
           const nameEl = item.querySelector('[data-a-target="side-nav-title"]');
-          const avatarEl = item.querySelector('img');
+          const avatarEl = item.querySelector("img");
 
           if (nameEl && avatarEl) {
             const name = nameEl.textContent.trim();
             let avatar = avatarEl.src;
-            if (avatar && avatar.includes('profile_image')) {
-              avatar = avatar.replace(/-[0-9]+x[0-9]+/, '-70x70');
+            if (avatar && avatar.includes("profile_image")) {
+              avatar = avatar.replace(/-[0-9]+x[0-9]+/, "-70x70");
             }
 
             // 从链接中提取用户名
             let url = `https://www.twitch.tv/${name.toLowerCase()}`;
-            const linkEl = item.querySelector('a');
+            const linkEl = item.querySelector("a");
             if (linkEl && linkEl.href) {
               url = linkEl.href;
             }
@@ -235,11 +221,11 @@ class ContentExtractor {
               url: url,
               isLive: false, // 侧边栏不显示直播状态
               title: name,
-              platform: 'twitch'
+              platform: "twitch",
             });
           }
         } catch (error) {
-          console.error('解析Twitch侧边栏数据错误:', error);
+          console.error("解析Twitch侧边栏数据错误:", error);
         }
       });
     }
@@ -248,14 +234,14 @@ class ContentExtractor {
     const uniqueStreamers = [];
     const seenUrls = new Set();
 
-    streamers.forEach(streamer => {
+    streamers.forEach((streamer) => {
       if (!seenUrls.has(streamer.url)) {
         seenUrls.add(streamer.url);
         uniqueStreamers.push(streamer);
       }
     });
 
-    console.log('Twitch提取到的数据:', uniqueStreamers);
+    console.log("Twitch提取到的数据:", uniqueStreamers);
     return uniqueStreamers;
   }
 }

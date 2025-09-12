@@ -126,7 +126,7 @@ class DouyuAPI {
         followers: 0, // 斗鱼关注列表API不返回粉丝数
         startTime: item.show_time ? new Date(item.show_time * 1000) : null, // 时间戳转换
         thumbnail: item.room_src,
-        gameName: item.game_name || '',
+        gameName: item.game_name || "",
       };
       return streamer;
     });
@@ -225,7 +225,7 @@ class HuyaAPI {
       followers: item.activityCount || 0,
       startTime: item.startTime ? new Date(item.startTime * 1000) : null,
       thumbnail: item.screenshot,
-      gameName: item.gameName || '',
+      gameName: item.gameName || "",
     }));
   }
 }
@@ -305,7 +305,7 @@ class BilibiliAPI {
         followers: 0, //b站无法索取粉丝数
         liveTime: item.live_time,
         thumbnail: item.keyframe || item.cover_from_user,
-        gameName: item.area_v2_name || '',
+        gameName: item.area_v2_name || "",
       };
 
       return streamer;
@@ -397,7 +397,7 @@ class DouyinAPI {
         viewers: room.stats?.user_count_str || "0",
         followers: 0, // 抖音API不返回粉丝数
         thumbnail: room.cover?.url_list?.[0] || "",
-        gameName: '', // 抖音无法获取游戏名称
+        gameName: "", // 抖音无法获取游戏名称
       };
 
       return streamer;
@@ -525,7 +525,7 @@ class TwitchAPI {
 
     return followedStreams.map((node) => {
       const streamer = {
-        name: node.broadcaster.displayName || '未知主播',
+        name: node.broadcaster.displayName || "未知主播",
         avatar: node.broadcaster.profileImageURL,
         url: `https://www.twitch.tv/${node.broadcaster.login}`,
         isLive: true,
@@ -534,8 +534,8 @@ class TwitchAPI {
         viewers: node.viewersCount || 0,
         followers: 0, // Twitch API不直接提供粉丝数
         thumbnail: `https://static-cdn.jtvnw.net/previews-ttv/live_user_${node.broadcaster.login}-320x180.jpg`,
-        gameName: node.game.displayName || '',
-      }
+        gameName: node.game.displayName || "",
+      };
 
       return streamer;
     });

@@ -1,857 +1,101 @@
 <!DOCTYPE html>
 <html>
-
-<head>
-  <meta charset="utf-8">
-  <style>
-    /* 基础样式 */
-    body {
-      width: 480px;
-      margin: 0;
-      padding: 12px;
-      transition: background-color 0.3s ease, color 0.3s ease;
-    }
-
-    /* 暗黑主题 */
-    @media (prefers-color-scheme: dark) {
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      /* 基础样式 */
       body {
-        background: #1a1a1a;
-        color: #e5e5e5;
+        width: 480px;
+        margin: 0;
+        padding: 12px;
+        transition: background-color 0.3s ease, color 0.3s ease;
       }
-    }
 
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 8px;
-      padding-bottom: 8px;
-      border-bottom: 1px solid #e0e0e0;
-    }
+      /* 页脚样式 */
+      .project-footer {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        font-size: 14px;
+        color: #666;
+        height: 100%;
+      }
 
-    .title {
-      font-size: 20px;
-      font-weight: 600;
-      color: #333;
-    }
+      .version-info {
+        display: inline-flex;
+        align-items: center;
+      }
 
-    /* 暗黑主题 - 标题 */
-    @media (prefers-color-scheme: dark) {
+      .version-number {
+        padding-right: 12px;
+        font-size: 12px;
+      }
+
+      .project-link {
+        display: inline-flex;
+        align-items: center;
+        font-size: 12px;
+      }
+
+      .project-icon {
+        margin-right: 4px;
+      }
+
+      /* 暗黑主题 */
+      @media (prefers-color-scheme: dark) {
+        body {
+          background: #1a1a1a;
+          color: #e5e5e5;
+        }
+      }
+
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid #e0e0e0;
+      }
+
       .title {
-        color: #e5e5e5;
-      }
-    }
-
-    .btn {
-      background: #4285f4;
-      color: white;
-      border: none;
-      padding: 6px 12px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 12px;
-      font-weight: 500;
-      transition: background-color 0.2s ease;
-    }
-
-    .btn:hover {
-      background: #3367d6;
-    }
-
-    .apply-settings-btn {
-      margin-top: 24px;
-      width: 100%;
-      padding: 10px;
-      font-size: 14px;
-      font-weight: 500;
-      border-radius: 6px;
-      transition: background-color 0.2s ease;
-      background: #4285f4;
-      color: white;
-    }
-
-    .apply-settings-btn:hover {
-      background: #3367d6;
-    }
-
-    .platform-section {
-      margin-bottom: 12px;
-    }
-
-    .platform-title {
-      font-size: 15px;
-      font-weight: 600;
-      color: #374151;
-      margin-bottom: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 8px 0;
-      border-bottom: 1px solid #f3f4f6;
-    }
-
-    /* 暗黑主题 - 平台标题 */
-    @media (prefers-color-scheme: dark) {
-      .platform-title {
-        color: #d1d5db;
-        border-bottom-color: #404040;
-      }
-    }
-
-    .platform-name {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex: 1;
-      font-size: 20px;
-    }
-
-    .platform-header {
-      display: flex;
-      align-items: center;
-      cursor: pointer;
-      color: inherit;
-      text-decoration: none;
-    }
-
-    .platform-header:hover {
-      opacity: 0.8;
-    }
-
-    .live-count {
-      font-size: 14px;
-      font-weight: 500;
-      color: #10b981;
-      padding: 4px 10px;
-      border-radius: 12px;
-      border: 1px solid #bbf7d0;
-    }
-
-    .platform-icon {
-      width: 20px;
-      height: 20px;
-      margin-right: 6px;
-      border-radius: 2px;
-      object-fit: contain;
-    }
-
-    .streamer-list {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
-
-    /* 统一的主播卡片样式 */
-    .streamer-item {
-      display: flex;
-      align-items: center;
-      padding: 6px;
-      margin-bottom: 6px;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      flex-direction: row;
-      align-items: flex-start;
-    }
-
-    /* 浅色主题 - 主播卡片 */
-    .streamer-item {
-      background: #ffffff;
-      border: 1px solid #e1e5e9;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-    }
-
-    .streamer-item:hover {
-      background: #f8f9fa;
-      border-color: #d1d5db;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-      transform: translateY(-1px);
-    }
-
-    .streamer-item.live {
-      background: #ffffff;
-    }
-
-    .streamer-item.live:hover {
-      background: #f8f9fa;
-    }
-
-    /* 暗黑主题 - 主播卡片 */
-    @media (prefers-color-scheme: dark) {
-      .streamer-item {
-        background: #2d2d2d;
-        border-color: #404040;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+        font-size: 20px;
+        font-weight: 600;
+        color: #333;
       }
 
-      .streamer-item:hover {
-        background: #3a3a3a;
-        border-color: #555555;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+      /* 暗黑主题 - 标题 */
+      @media (prefers-color-scheme: dark) {
+        .title {
+          color: #e5e5e5;
+        }
       }
 
-      .streamer-item.live {
-        background: #2d2d2d;
+      .btn {
+        background: #4285f4;
+        color: white;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: 500;
+        transition: background-color 0.2s ease;
       }
 
-      .streamer-item.live:hover {
-        background: #3a3a3a;
-      }
-    }
-
-    .streamer-avatar {
-      width: 60px;
-      height: 60px;
-      border-radius: 6px;
-      margin-right: 8px;
-      object-fit: cover;
-      border: 2px solid #f3f4f6;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      background: #f9fafb;
-      transition: all 0.2s ease;
-    }
-
-    .streamer-item:hover .streamer-avatar {
-      border-color: #e5e7eb;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-    }
-
-    .login-prompt {
-      padding: 12px;
-      background: #fff3cd;
-      border: 1px solid #ffeaa7;
-      border-radius: 6px;
-      margin-bottom: 8px;
-    }
-
-    .login-message {
-      font-size: 14px;
-      color: #856404;
-      margin-bottom: 8px;
-    }
-
-    .login-btn {
-      background: #007bff;
-      color: white;
-      border: none;
-      padding: 6px 12px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 12px;
-      width: 100%;
-    }
-
-    .login-btn:hover {
-      background: #0056b3;
-    }
-
-    /* 暗黑主题 - 登录提示 */
-    @media (prefers-color-scheme: dark) {
-      .login-prompt {
-        background: #3a2f1a;
-        border-color: #5a4a2a;
-      }
-
-      .login-message {
-        color: #d4b106;
-      }
-
-      .login-btn {
-        background: #0d6efd;
-      }
-
-      .login-btn:hover {
-        background: #0b5ed7;
-      }
-    }
-
-    .no-live,
-    .no-follow {
-      padding: 12px;
-      text-align: center;
-      color: #999;
-      font-size: 14px;
-      background: #f8f9fa;
-      border-radius: 6px;
-      margin-bottom: 8px;
-    }
-
-    /* 暗黑主题 - 空状态 */
-    @media (prefers-color-scheme: dark) {
-
-      .no-live,
-      .no-follow {
-        background: #2d2d2d;
-        color: #888;
-      }
-    }
-
-    .streamer-thumbnail {
-      width: 160px;
-      height: 90px;
-      border-radius: 4px;
-      margin-right: 8px;
-      object-fit: cover;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    }
-
-    .streamer-info {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .streamer-name {
-      font-size: 16px;
-      font-weight: 500;
-      color: #333;
-      flex-shrink: 0;
-      min-width: 0;
-    }
-
-    .streamer-name-container {
-      display: flex;
-      justify-content: space-between;
-      width: 100%;
-      align-items: center;
-      margin-bottom: 2px;
-      gap: 20px;
-    }
-
-    .favorite-button {
-      background: none;
-      border: none;
-      cursor: pointer;
-      font-size: 16px;
-      padding: 0;
-      margin-left: 8px;
-      transition: transform 0.2s ease;
-      line-height: 1;
-      font-family: Arial, sans-serif;
-      /* 确保字符正确显示 */
-    }
-
-    .favorite-button:hover {
-      transform: scale(1.1);
-    }
-
-    .favorite-button.favorited {
-      color: #ffd700;
-      /* 黄色 */
-    }
-
-    .favorite-button.not-favorited {
-      color: #d1d5db;
-      /* 灰色 */
-    }
-
-    /* 暗黑主题 - 收藏按钮 */
-    @media (prefers-color-scheme: dark) {
-      .favorite-button.not-favorited {
-        color: #6b7280;
-        /* 暗色灰 */
-      }
-    }
-
-    .game-name {
-      font-size: 12px;
-      color: #9ca3af;
-      flex-shrink: 1;
-      min-width: 0;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .streamer-title {
-      font-size: 14px;
-      color: #6b7280;
-      font-weight: 400;
-      margin-bottom: 4px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      line-clamp: 2;
-    }
-
-    .streamer-title-container {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      width: 100%;
-    }
-
-    .streamer-title-container .streamer-title {
-      flex: 1;
-      margin-right: 8px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      line-clamp: 2;
-    }
-
-    /* 暗黑主题 - 主播信息 */
-    @media (prefers-color-scheme: dark) {
-      .streamer-name {
-        color: #e5e5e5;
-      }
-
-      .streamer-title {
-        color: #9ca3af;
-      }
-    }
-
-    .streamer-stats {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      height: 20px;
-    }
-
-    .streamer-info {
-      display: flex;
-      align-items: flex-start;
-      flex: 1;
-      min-width: 0;
-      max-height: 64px;
-    }
-
-    .streamer-basic-info {
-      flex: 1;
-    }
-
-    .stat-item {
-      font-size: 12px;
-      color: #9ca3af;
-      display: flex;
-      align-items: center;
-      gap: 2px;
-    }
-
-    .stat-item .icon {
-      font-size: 10px;
-      margin-right: 1px;
-    }
-
-    .streamer-content {
-      display: flex;
-      flex-direction: column;
-      flex: 1;
-      min-width: 0;
-      height: 90px;
-      justify-content: space-between;
-    }
-
-    .streamer-basic-info {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .streamer-name {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .streamer-title {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      line-clamp: 2;
-    }
-
-    .loading {
-      text-align: center;
-      padding: 40px;
-      color: #666;
-      font-size: 16px;
-    }
-
-    .empty {
-      text-align: center;
-      padding: 40px;
-      color: #999;
-      font-size: 16px;
-    }
-
-    /* 加载动画 */
-    .spinner {
-      border: 4px solid #f3f3f3;
-      border-top: 4px solid #4285f4;
-      border-radius: 50%;
-      width: 30px;
-      height: 30px;
-      animation: spin 1s linear infinite;
-      margin: 0 auto 16px;
-    }
-
-    @keyframes spin {
-      0% {
-        transform: rotate(0deg);
-      }
-
-      100% {
-        transform: rotate(360deg);
-      }
-    }
-
-    /* 刷新按钮加载状态 */
-    .refresh-loading {
-      position: relative;
-      pointer-events: none;
-    }
-
-    .refresh-spinner {
-      display: inline-block;
-      width: 10px;
-      height: 10px;
-      border: 2px solid #ffffff;
-      border-bottom-color: transparent;
-      border-radius: 50%;
-      animation: spinner 0.8s linear infinite;
-      margin-right: 8px;
-      vertical-align: middle;
-    }
-
-    @keyframes spinner {
-      to {
-        transform: rotate(360deg);
-      }
-    }
-
-    /* 悬浮按钮样式 */
-    .floating-buttons {
-      position: fixed;
-      bottom: 8px;
-      right: 8px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      z-index: 99999;
-    }
-
-    .floating-button {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      background: #4285f4;
-      border: none;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-      transition: all 0.2s ease;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .floating-button:hover {
-      background: #3367d6;
-      transform: scale(1.1);
-    }
-
-    .floating-button::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      border-radius: 50%;
-      box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
-    }
-
-    .floating-button-icon {
-      width: 20px;
-      height: 20px;
-      object-fit: contain;
-    }
-
-    /* 特别处理B站图标，强制显示为白色 */
-    .bilibili-icon {
-      filter: brightness(0) invert(1);
-      /* 强制让B站图标显示为白色 */
-    }
-
-    .floating-button-label {
-      position: absolute;
-      bottom: 50px;
-      right: 0;
-      background: #333;
-      color: white;
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-size: 12px;
-      white-space: nowrap;
-      opacity: 0;
-      visibility: hidden;
-      transition: all 0.2s ease;
-      transform: translateY(5px);
-    }
-
-    .floating-button:hover .floating-button-label {
-      opacity: 1;
-      visibility: visible;
-      transform: translateY(0);
-    }
-
-    /* 返回顶部按钮 */
-    .top-button {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      background: #4285f4;
-      border: none;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-      transition: all 0.2s ease;
-      position: relative;
-    }
-
-    .top-button:hover {
-      background: #3367d6;
-      transform: scale(1.1);
-    }
-
-    .top-button::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      border-radius: 50%;
-      box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
-    }
-
-    .top-button-icon {
-      width: 20px;
-      height: 20px;
-      object-fit: contain;
-    }
-
-    /* 折叠按钮 */
-    .collapse-button {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      background: #4285f4;
-      border: none;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-      transition: all 0.2s ease;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .collapse-button:hover {
-      background: #3367d6;
-      transform: scale(1.1);
-    }
-
-    .collapse-button::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      border-radius: 50%;
-      box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
-    }
-
-    .collapse-button-icon {
-      width: 20px;
-      height: 20px;
-      object-fit: contain;
-    }
-
-    /* 悬浮按钮容器 */
-    .floating-buttons-container {
-      position: relative;
-    }
-
-    /* 折叠状态样式 */
-    .floating-buttons.collapsed {
-      /* 当处于折叠状态时，只显示折叠按钮 */
-    }
-
-    .floating-buttons.collapsed .floating-button,
-    .floating-buttons.collapsed .top-button {
-      display: none !important;
-    }
-
-    .floating-buttons.collapsed .collapse-button {
-      display: flex !important;
-    }
-
-    /* 设置区域样式 */
-    .settings-panel {
-      display: none;
-      margin-top: 20px;
-      padding: 20px;
-      border-radius: 12px;
-      position: relative;
-      z-index: 100;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-    }
-
-    .settings-heading {
-      margin-top: 0;
-      margin-bottom: 16px;
-      font-size: 18px;
-      font-weight: 600;
-    }
-
-    .settings-description {
-      font-size: 14px;
-      color: #666;
-      margin-bottom: 20px;
-      line-height: 1.5;
-    }
-
-    .platform-sortable-list {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-      overflow-y: auto;
-      border-radius: 8px;
-    }
-
-    .platform-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 12px;
-      background: #ffffff;
-      border: 1px solid #e0e0e0;
-      border-radius: 8px;
-      margin-bottom: 8px;
-      cursor: move;
-      transition: all 0.2s ease;
-    }
-
-    .platform-item:hover {
-      background: #f8f9fa;
-      border-color: #d1d5db;
-    }
-
-    .platform-item.disabled {
-      opacity: 0.6;
-      background: #f5f5f5;
-    }
-
-    .platform-item.disabled .platform-name {
-      color: #999;
-    }
-
-    .platform-switch {
-      margin-left: auto;
-      position: relative;
-      display: inline-block;
-      width: 40px;
-      height: 20px;
-    }
-
-    .platform-switch input {
-      opacity: 0;
-      width: 0;
-      height: 0;
-    }
-
-    .switch-slider {
-      position: absolute;
-      cursor: pointer;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-color: #ccc;
-      transition: .4s;
-      border-radius: 24px;
-    }
-
-    .switch-slider:before {
-      position: absolute;
-      content: "";
-      height: 12px;
-      width: 12px;
-      left: 4px;
-      bottom: 4px;
-      background-color: white;
-      transition: .4s;
-      border-radius: 50%;
-    }
-
-    input:checked+.switch-slider {
-      background-color: #4285f4;
-    }
-
-    input:checked+.switch-slider:before {
-      transform: translateX(20px);
-    }
-
-    .drag-handle {
-      color: #999;
-      cursor: move;
-      font-size: 18px;
-      font-weight: bold;
-    }
-
-    .apply-settings-btn {
-      margin-top: 24px;
-      width: 100%;
-      padding: 10px;
-      font-size: 14px;
-      cursor: pointer;
-      font-weight: 500;
-    }
-
-    /* 暗黑主题 - 设置区域 */
-    @media (prefers-color-scheme: dark) {
-      .settings-panel {
-        background: #2d2d2d;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-      }
-
-      .settings-heading {
-        color: #e5e5e5;
-      }
-
-      .settings-description {
-        color: #b0b0b0;
-      }
-
-      .platform-item {
-        background: #3a3a3a;
-        border: 1px solid #404040;
-      }
-
-      .platform-item:hover {
-        background: #444444;
-      }
-
-      .platform-name {
-        color: #e5e5e5;
-      }
-
-      .drag-handle {
-        color: #999;
+      .btn:hover {
+        background: #3367d6;
       }
 
       .apply-settings-btn {
+        margin-top: 24px;
+        width: 100%;
+        padding: 10px;
+        font-size: 14px;
+        font-weight: 500;
+        border-radius: 6px;
+        transition: background-color 0.2s ease;
         background: #4285f4;
         color: white;
       }
@@ -859,80 +103,868 @@
       .apply-settings-btn:hover {
         background: #3367d6;
       }
-    }
 
-    .message-container {
-      display: none;
-      position: fixed;
-      top: 16px;
-      left: 50%;
-      transform: translateX(-50%);
-      padding: 12px 24px;
-      background: #4285f4;
-      color: white;
-      border-radius: 6px;
-      z-index: 99999;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    }
+      .platform-section {
+        margin-bottom: 12px;
+      }
 
-    .floating-button-label-span {
-      font-size: 15px;
-      font-weight: 600;
-      flex: 1;
-    }
-  </style>
-</head>
+      .platform-title {
+        font-size: 15px;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 0;
+        border-bottom: 1px solid #f3f4f6;
+      }
 
-<body>
-  <div class="header">
-    <div class="title">直播小助手</div>
-    <div class="btn-group">
-      <button class="btn" id="refreshBtn">刷新</button>
-      <button class="btn" id="settingsBtn">设置</button>
+      /* 暗黑主题 - 平台标题 */
+      @media (prefers-color-scheme: dark) {
+        .platform-title {
+          color: #d1d5db;
+          border-bottom-color: #404040;
+        }
+      }
+
+      .platform-name {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex: 1;
+        font-size: 20px;
+      }
+
+      .platform-header {
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .platform-header:hover {
+        opacity: 0.8;
+      }
+
+      .live-count {
+        font-size: 14px;
+        font-weight: 500;
+        color: #10b981;
+        padding: 4px 10px;
+        border-radius: 12px;
+        border: 1px solid #bbf7d0;
+      }
+
+      .platform-icon {
+        width: 20px;
+        height: 20px;
+        margin-right: 6px;
+        border-radius: 2px;
+        object-fit: contain;
+      }
+
+      .streamer-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+
+      /* 统一的主播卡片样式 */
+      .streamer-item {
+        display: flex;
+        align-items: center;
+        padding: 6px;
+        margin-bottom: 6px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        flex-direction: row;
+        align-items: flex-start;
+      }
+
+      /* 浅色主题 - 主播卡片 */
+      .streamer-item {
+        background: #ffffff;
+        border: 1px solid #e1e5e9;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      }
+
+      .streamer-item:hover {
+        background: #f8f9fa;
+        border-color: #d1d5db;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        transform: translateY(-1px);
+      }
+
+      .streamer-item.live {
+        background: #ffffff;
+      }
+
+      .streamer-item.live:hover {
+        background: #f8f9fa;
+      }
+
+      /* 暗黑主题 - 主播卡片 */
+      @media (prefers-color-scheme: dark) {
+        .streamer-item {
+          background: #2d2d2d;
+          border-color: #404040;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+        }
+
+        .streamer-item:hover {
+          background: #3a3a3a;
+          border-color: #555555;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+        }
+
+        .streamer-item.live {
+          background: #2d2d2d;
+        }
+
+        .streamer-item.live:hover {
+          background: #3a3a3a;
+        }
+      }
+
+      .streamer-avatar {
+        width: 60px;
+        height: 60px;
+        border-radius: 6px;
+        margin-right: 8px;
+        object-fit: cover;
+        border: 2px solid #f3f4f6;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        background: #f9fafb;
+        transition: all 0.2s ease;
+      }
+
+      .streamer-item:hover .streamer-avatar {
+        border-color: #e5e7eb;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+      }
+
+      .login-prompt {
+        padding: 12px;
+        background: #fff3cd;
+        border: 1px solid #ffeaa7;
+        border-radius: 6px;
+        margin-bottom: 8px;
+      }
+
+      .login-message {
+        font-size: 14px;
+        color: #856404;
+        margin-bottom: 8px;
+      }
+
+      .login-btn {
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 12px;
+        width: 100%;
+      }
+
+      .login-btn:hover {
+        background: #0056b3;
+      }
+
+      /* 暗黑主题 - 登录提示 */
+      @media (prefers-color-scheme: dark) {
+        .login-prompt {
+          background: #3a2f1a;
+          border-color: #5a4a2a;
+        }
+
+        .login-message {
+          color: #d4b106;
+        }
+
+        .login-btn {
+          background: #0d6efd;
+        }
+
+        .login-btn:hover {
+          background: #0b5ed7;
+        }
+      }
+
+      .no-live,
+      .no-follow {
+        padding: 12px;
+        text-align: center;
+        color: #999;
+        font-size: 14px;
+        background: #f8f9fa;
+        border-radius: 6px;
+        margin-bottom: 8px;
+      }
+
+      /* 暗黑主题 - 空状态 */
+      @media (prefers-color-scheme: dark) {
+        .no-live,
+        .no-follow {
+          background: #2d2d2d;
+          color: #888;
+        }
+      }
+
+      .streamer-thumbnail {
+        width: 160px;
+        height: 90px;
+        border-radius: 4px;
+        margin-right: 8px;
+        object-fit: cover;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      }
+
+      .streamer-info {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .streamer-name {
+        font-size: 16px;
+        font-weight: 500;
+        color: #333;
+        flex-shrink: 0;
+        min-width: 0;
+      }
+
+      .streamer-name-container {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+        align-items: center;
+        margin-bottom: 2px;
+        gap: 20px;
+      }
+
+      .favorite-button {
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 16px;
+        padding: 0;
+        margin-left: 8px;
+        transition: transform 0.2s ease;
+        line-height: 1;
+        font-family: Arial, sans-serif;
+        /* 确保字符正确显示 */
+      }
+
+      .favorite-button:hover {
+        transform: scale(1.1);
+      }
+
+      .favorite-button.favorited {
+        color: #ffd700;
+        /* 黄色 */
+      }
+
+      .favorite-button.not-favorited {
+        color: #d1d5db;
+        /* 灰色 */
+      }
+
+      /* 暗黑主题 - 收藏按钮 */
+      @media (prefers-color-scheme: dark) {
+        .favorite-button.not-favorited {
+          color: #6b7280;
+          /* 暗色灰 */
+        }
+      }
+
+      .game-name {
+        font-size: 12px;
+        color: #9ca3af;
+        flex-shrink: 1;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .streamer-title {
+        font-size: 14px;
+        color: #6b7280;
+        font-weight: 400;
+        margin-bottom: 4px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        line-clamp: 2;
+      }
+
+      .streamer-title-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        width: 100%;
+      }
+
+      .streamer-title-container .streamer-title {
+        flex: 1;
+        margin-right: 8px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        line-clamp: 2;
+      }
+
+      /* 暗黑主题 - 主播信息 */
+      @media (prefers-color-scheme: dark) {
+        .streamer-name {
+          color: #e5e5e5;
+        }
+
+        .streamer-title {
+          color: #9ca3af;
+        }
+      }
+
+      .streamer-stats {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        height: 20px;
+      }
+
+      .streamer-info {
+        display: flex;
+        align-items: flex-start;
+        flex: 1;
+        min-width: 0;
+        max-height: 64px;
+      }
+
+      .streamer-basic-info {
+        flex: 1;
+      }
+
+      .stat-item {
+        font-size: 12px;
+        color: #9ca3af;
+        display: flex;
+        align-items: center;
+        gap: 2px;
+      }
+
+      .stat-item .icon {
+        font-size: 10px;
+        margin-right: 1px;
+      }
+
+      .streamer-content {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        min-width: 0;
+        height: 90px;
+        justify-content: space-between;
+      }
+
+      .streamer-basic-info {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .streamer-name {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .streamer-title {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        line-clamp: 2;
+      }
+
+      .loading {
+        text-align: center;
+        padding: 40px;
+        color: #666;
+        font-size: 16px;
+      }
+
+      .empty {
+        text-align: center;
+        padding: 40px;
+        color: #999;
+        font-size: 16px;
+      }
+
+      /* 加载动画 */
+      .spinner {
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #4285f4;
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 16px;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* 刷新按钮加载状态 */
+      .refresh-loading {
+        position: relative;
+        pointer-events: none;
+      }
+
+      .refresh-spinner {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        border: 2px solid #ffffff;
+        border-bottom-color: transparent;
+        border-radius: 50%;
+        animation: spinner 0.8s linear infinite;
+        margin-right: 8px;
+        vertical-align: middle;
+      }
+
+      @keyframes spinner {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* 悬浮按钮样式 */
+      .floating-buttons {
+        position: fixed;
+        bottom: 8px;
+        right: 8px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        z-index: 99999;
+      }
+
+      .floating-button {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: #4285f4;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        transition: all 0.2s ease;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .floating-button:hover {
+        background: #3367d6;
+        transform: scale(1.1);
+      }
+
+      .floating-button::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        border-radius: 50%;
+        box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
+      }
+
+      .floating-button-icon {
+        width: 20px;
+        height: 20px;
+        object-fit: contain;
+      }
+
+      /* 特别处理B站图标，强制显示为白色 */
+      .bilibili-icon {
+        filter: brightness(0) invert(1);
+        /* 强制让B站图标显示为白色 */
+      }
+
+      .floating-button-label {
+        position: absolute;
+        bottom: 50px;
+        right: 0;
+        background: #333;
+        color: white;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        white-space: nowrap;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.2s ease;
+        transform: translateY(5px);
+      }
+
+      .floating-button:hover .floating-button-label {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+      }
+
+      /* 返回顶部按钮 */
+      .top-button {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: #4285f4;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        transition: all 0.2s ease;
+        position: relative;
+      }
+
+      .top-button:hover {
+        background: #3367d6;
+        transform: scale(1.1);
+      }
+
+      .top-button::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        border-radius: 50%;
+        box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
+      }
+
+      .top-button-icon {
+        width: 20px;
+        height: 20px;
+        object-fit: contain;
+      }
+
+      /* 折叠按钮 */
+      .collapse-button {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: #4285f4;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        transition: all 0.2s ease;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .collapse-button:hover {
+        background: #3367d6;
+        transform: scale(1.1);
+      }
+
+      .collapse-button::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        border-radius: 50%;
+        box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
+      }
+
+      .collapse-button-icon {
+        width: 20px;
+        height: 20px;
+        object-fit: contain;
+      }
+
+      /* 悬浮按钮容器 */
+      .floating-buttons-container {
+        position: relative;
+      }
+
+      /* 折叠状态样式 */
+      .floating-buttons.collapsed {
+        /* 当处于折叠状态时，只显示折叠按钮 */
+      }
+
+      .floating-buttons.collapsed .floating-button,
+      .floating-buttons.collapsed .top-button {
+        display: none !important;
+      }
+
+      .floating-buttons.collapsed .collapse-button {
+        display: flex !important;
+      }
+
+      /* 设置区域样式 */
+      .settings-panel {
+        display: none;
+        margin-top: 20px;
+        padding: 20px;
+        border-radius: 12px;
+        position: relative;
+        z-index: 100;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      }
+
+      .settings-heading {
+        margin-top: 0;
+        margin-bottom: 16px;
+        font-size: 18px;
+        font-weight: 600;
+      }
+
+      .settings-description {
+        font-size: 14px;
+        color: #666;
+        margin-bottom: 20px;
+        line-height: 1.5;
+      }
+
+      .platform-sortable-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        overflow-y: auto;
+        border-radius: 8px;
+      }
+
+      .platform-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px;
+        background: #ffffff;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        margin-bottom: 8px;
+        cursor: move;
+        transition: all 0.2s ease;
+      }
+
+      .platform-item:hover {
+        background: #f8f9fa;
+        border-color: #d1d5db;
+      }
+
+      .platform-item.disabled {
+        opacity: 0.6;
+        background: #f5f5f5;
+      }
+
+      .platform-item.disabled .platform-name {
+        color: #999;
+      }
+
+      .platform-switch {
+        margin-left: auto;
+        position: relative;
+        display: inline-block;
+        width: 40px;
+        height: 20px;
+      }
+
+      .platform-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+
+      .switch-slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        transition: 0.4s;
+        border-radius: 24px;
+      }
+
+      .switch-slider:before {
+        position: absolute;
+        content: "";
+        height: 12px;
+        width: 12px;
+        left: 4px;
+        bottom: 4px;
+        background-color: white;
+        transition: 0.4s;
+        border-radius: 50%;
+      }
+
+      input:checked + .switch-slider {
+        background-color: #4285f4;
+      }
+
+      input:checked + .switch-slider:before {
+        transform: translateX(20px);
+      }
+
+      .drag-handle {
+        color: #999;
+        cursor: move;
+        font-size: 18px;
+        font-weight: bold;
+      }
+
+      .apply-settings-btn {
+        margin-top: 24px;
+        width: 100%;
+        padding: 10px;
+        font-size: 14px;
+        cursor: pointer;
+        font-weight: 500;
+      }
+
+      /* 暗黑主题 - 设置区域 */
+      @media (prefers-color-scheme: dark) {
+        .settings-panel {
+          background: #2d2d2d;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .settings-heading {
+          color: #e5e5e5;
+        }
+
+        .settings-description {
+          color: #b0b0b0;
+        }
+
+        .platform-item {
+          background: #3a3a3a;
+          border: 1px solid #404040;
+        }
+
+        .platform-item:hover {
+          background: #444444;
+        }
+
+        .platform-name {
+          color: #e5e5e5;
+        }
+
+        .drag-handle {
+          color: #999;
+        }
+
+        .apply-settings-btn {
+          background: #4285f4;
+          color: white;
+        }
+
+        .apply-settings-btn:hover {
+          background: #3367d6;
+        }
+      }
+
+      .message-container {
+        display: none;
+        position: fixed;
+        top: 16px;
+        left: 50%;
+        transform: translateX(-50%);
+        padding: 12px 24px;
+        background: #4285f4;
+        color: white;
+        border-radius: 6px;
+        z-index: 99999;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      }
+
+      .floating-button-label-span {
+        font-size: 15px;
+        font-weight: 600;
+        flex: 1;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="header">
+      <div class="title">直播小助手</div>
+      <div class="btn-group">
+        <button class="btn" id="refreshBtn">刷新</button>
+        <button class="btn" id="settingsBtn">设置</button>
+      </div>
     </div>
-  </div>
 
-  <div id="content">
-    <div class="loading">正在加载关注列表...</div>
-  </div>
-
-  <!-- 提示信息容器 -->
-  <div id="messageContainer" class="message-container"></div>
-
-  <!-- 设置区域 -->
-  <div id="settingsPanel" class="settings-panel">
-    <!-- 悬浮按钮显示开关 -->
-    <h3 class="settings-heading">悬浮按钮</h3>
-    <div class="platform-item">
-      <span class="floating-button-label-span">显示悬浮按钮</span>
-      <label class="platform-switch">
-        <input type="checkbox" id="floatingButtonToggle">
-        <span class="switch-slider"></span>
-      </label>
+    <div id="content">
+      <div class="loading">正在加载关注列表...</div>
     </div>
 
-    <h3 class="settings-heading">平台显示顺序设置</h3>
-    <p class="settings-description">拖拽平台项来调整显示顺序：</p>
-    <ul class="platform-sortable-list" id="platformSortable">
-      <!-- 平台项将通过JavaScript动态生成 -->
-    </ul>
+    <!-- 提示信息容器 -->
+    <div id="messageContainer" class="message-container"></div>
 
-    <button class="apply-settings-btn" id="applySettingsBtn">应用设置</button>
-    <button class="apply-settings-btn" id="resetSettingsBtn" style="background: #ff4757;">重置所有设置</button>
-  </div>
+    <!-- 设置区域 -->
+    <div id="settingsPanel" class="settings-panel">
+      <!-- 悬浮按钮显示开关 -->
+      <h3 class="settings-heading">悬浮按钮</h3>
+      <div class="platform-item">
+        <span class="floating-button-label-span">显示悬浮按钮</span>
+        <label class="platform-switch">
+          <input type="checkbox" id="floatingButtonToggle" />
+          <span class="switch-slider"></span>
+        </label>
+      </div>
 
-  <!-- 项目信息 -->
-  <div style="text-align: center; font-size: 14px; color: #666;">
-    <p>由 Licardo 用 ❤️ 开发</p>
-    <p><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"
-        style="vertical-align: middle; margin-right: 4px;">
-        <path
-          d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.6.113.82-.268.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.807 1.305 3.492.998.107-.775.418-1.305.762-1.605-2.665-.305-5.466-1.335-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.123-.303-.535-1.523.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.241 2.873.118 3.176.77.84 1.235 1.91 1.235 3.22 0 4.61-2.805 5.625-5.475 5.92.42.362.81 1.098.81 2.222 0 1.605-.015 2.895-.015 3.285 0 .315.21.69.825.577C20.565 21.795 24 17.3 24 12c0-6.627-5.373-12-12-12z" />
-      </svg><a href="https://github.com/L1cardo/Live-Assistant" target="_blank" style="color: #4285f4;">项目主页</a></p>
-  </div>
+      <h3 class="settings-heading">平台显示顺序设置</h3>
+      <p class="settings-description">拖拽平台项来调整显示顺序：</p>
+      <ul class="platform-sortable-list" id="platformSortable">
+        <!-- 平台项将通过JavaScript动态生成 -->
+      </ul>
 
+      <button class="apply-settings-btn" id="applySettingsBtn">应用设置</button>
+      <button class="apply-settings-btn" id="resetSettingsBtn" style="background: #ff4757">重置所有设置</button>
+    </div>
 
-  <script src="/src/popup.js"></script>
-</body>
+    <!-- 项目信息 -->
+    <footer class="project-footer">
+      <small>由 Licardo 用 ❤️ 开发</small>
+      <div class="version-info">
+        <span id="version" class="version-number"></span>
+        <span class="project-link">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" class="project-icon" role="img" aria-label="GitHub图标">
+            <title>GitHub</title>
+            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.6.113.82-.268.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.807 1.305 3.492.998.107-.775.418-1.305.762-1.605-2.665-.305-5.466-1.335-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.123-.303-.535-1.523.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.241 2.873.118 3.176.77.84 1.235 1.91 1.235 3.22 0 4.61-2.805 5.625-5.475 5.92.42.362.81 1.098.81 2.222 0 1.605-.015 2.895-.015 3.285 0 .315.21.69.825.577C20.565 21.795 24 17.3 24 12c0-6.627-5.373-12-12-12z" />
+          </svg>
+          <a href="https://github.com/L1cardo/Live-Assistant" target="_blank" style="color: #4285f4">项目主页</a>
+        </span>
+      </div>
+    </footer>
 
+    <script src="/src/popup.js"></script>
+  </body>
 </html>
