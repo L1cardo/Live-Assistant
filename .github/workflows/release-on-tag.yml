@@ -37,8 +37,8 @@ jobs:
             current_tag="${GITHUB_REF#refs/tags/}"
           fi
           previous_tag=$(git tag --sort=-v:refname | grep -v "^$current_tag$" | head -n 1)
-          echo "current_tag=$current_tag" >> $GITHUB_OUTPUT
-          echo "previous_tag=$previous_tag" >> $GITHUB_OUTPUT
+          echo "current_tag=${current_tag}" >> $GITHUB_OUTPUT
+          echo "previous_tag=${previous_tag}" >> $GITHUB_OUTPUT
 
       - name: 📝 Create Release
         uses: softprops/action-gh-release@v2
