@@ -21,6 +21,8 @@ jobs:
     steps:
       - name: ⤵️ Check out code from GitHub
         uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
 
       - name: 📦 Package extension
         run: |
@@ -36,6 +38,12 @@ jobs:
             current_tag="${GITHUB_REF#refs/tags/}"
           fi
           previous_tag=$(git tag --sort=-v:refname | grep -v "^$current_tag$" | head -n 1)
+          
+          # If no previous tag found, use a default value
+          if [ -z "$previous_tag" ]; then
+            previous_tag="HEAD"
+          fi
+          
           echo "current_tag=${current_tag}" >> $GITHUB_OUTPUT
           echo "previous_tag=${previous_tag}" >> $GITHUB_OUTPUT
 
